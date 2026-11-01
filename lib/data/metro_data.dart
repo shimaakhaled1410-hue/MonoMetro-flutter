@@ -748,7 +748,7 @@ class MetroData {
       longitude: 31.7850,
       lines: ["Monorail East"],
     ),
-    // --- BRT Ring Road Active Stations ---
+    // --- BRT Ring Road Full Stations ---
     Station(
       name: "Al Asher Station",
       nameAr: "موقف العاشر",
@@ -848,10 +848,31 @@ class MetroData {
       lines: ["BRT Ring Road"],
     ),
     Station(
+      name: "Al Moatamadeya",
+      nameAr: "المعتمدية",
+      latitude: 30.0380,
+      longitude: 31.1810,
+      lines: ["BRT Ring Road"],
+    ),
+    Station(
+      name: "Zenein",
+      nameAr: "زنين",
+      latitude: 30.0260,
+      longitude: 31.1760,
+      lines: ["BRT Ring Road"],
+    ),
+    Station(
       name: "Saft El Laban",
       nameAr: "صفط اللبن",
       latitude: 30.0210,
       longitude: 31.1750,
+      lines: ["BRT Ring Road"],
+    ),
+    Station(
+      name: "Manshiyet El Bakari",
+      nameAr: "منشأة البكاري",
+      latitude: 30.0150,
+      longitude: 31.1740,
       lines: ["BRT Ring Road"],
     ),
     Station(
@@ -876,6 +897,41 @@ class MetroData {
       lines: ["BRT Ring Road"],
     ),
     Station(
+      name: "Tersa",
+      nameAr: "ترسا",
+      latitude: 29.9920,
+      longitude: 31.1830,
+      lines: ["BRT Ring Road"],
+    ),
+    Station(
+      name: "Al Qasabgi",
+      nameAr: "القصبجي",
+      latitude: 29.9880,
+      longitude: 31.1920,
+      lines: ["BRT Ring Road"],
+    ),
+    Station(
+      name: "Bahr El Aazam",
+      nameAr: "البحر الأعظم",
+      latitude: 29.9790,
+      longitude: 31.2180,
+      lines: ["BRT Ring Road"],
+    ),
+    Station(
+      name: "Corniche El Nile",
+      nameAr: "كورنيش النيل",
+      latitude: 29.9750,
+      longitude: 31.2310,
+      lines: ["BRT Ring Road"],
+    ),
+    Station(
+      name: "El Zahraa",
+      nameAr: "الزهراء",
+      latitude: 29.9720,
+      longitude: 31.2650,
+      lines: ["BRT Ring Road"],
+    ),
+    Station(
       name: "Autostrad",
       nameAr: "الأوتوستراد",
       latitude: 29.9750,
@@ -887,6 +943,13 @@ class MetroData {
       nameAr: "كارفور المعادي",
       latitude: 29.9800,
       longitude: 31.3150,
+      lines: ["BRT Ring Road"],
+    ),
+    Station(
+      name: "Golf Tunnel",
+      nameAr: "نفق الجولف",
+      latitude: 30.0020,
+      longitude: 31.3950,
       lines: ["BRT Ring Road"],
     ),
   ];
@@ -1021,7 +1084,7 @@ class MetroData {
     "Justice City",
   ];
 
-  static const List<String> brtRingRoadNames = [
+ static const List<String> brtRingRoadNames = [
     "Adly Mansour",
     "Al Asher Station",
     "Belbeis Road",
@@ -1037,16 +1100,26 @@ class MetroData {
     "Warraq",
     "Bassous",
     "Rod El Farag Corridor",
+    "Al Qawmia Al Arabiya",
     "Bashteel",
     "Ard El Lewa",
     "Mehwar 26th of July",
+    "Al Moatamadeya",
+    "Zenein",
     "Saft El Laban",
+    "Manshiyet El Bakari",
     "Marioutiya",
     "Haram",
     "Faisal",
+    "Tersa",
+    "Al Qasabgi",
     "El Moneeb",
+    "Bahr El Aazam",
+    "Corniche El Nile",
+    "El Zahraa",
     "Autostrad",
     "Carrefour Maadi",
+    "Golf Tunnel",
     "One Ninety",
   ];
 }
