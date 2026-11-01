@@ -106,13 +106,6 @@ class MetroLocationHelper {
                 'monorail'.tr,
                 () => onSelectTransit('monorail'),
               ),
-              const SizedBox(height: 10),
-              _buildTile(
-                Icons.directions_bus_rounded,
-                const Color(0xFFF39C12),
-                'brt'.tr,
-                () => onSelectTransit('brt'),
-              ),
             ],
           ),
         ),

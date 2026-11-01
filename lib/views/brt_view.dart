@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/metro_controller.dart';
+import '../data/metro_data.dart';
 import '../models/station_model.dart';
 import '../services/brt_service.dart';
 import 'widgets/brt_station_picker_sheet.dart';
@@ -18,6 +19,14 @@ class _BrtViewState extends State<BrtView> {
   String? brtStartStation;
   String? brtEndStation;
   TripResult? brtTrip;
+
+  String _getStationDisplayName(String? name) {
+    if (name == null) return '';
+    final station = MetroData.allStations.firstWhereOrNull(
+      (s) => s.name == name,
+    );
+    return station?.localizedName ?? name;
+  }
 
   void _openPicker(bool isStart) {
     showModalBottomSheet(
@@ -65,10 +74,7 @@ class _BrtViewState extends State<BrtView> {
     final primaryColor = Theme.of(context).colorScheme.primary;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('nav_brt'.tr),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: Text('nav_brt'.tr), centerTitle: true),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -80,15 +86,29 @@ class _BrtViewState extends State<BrtView> {
                 child: Column(
                   children: [
                     ListTile(
-                      leading: const Icon(Icons.trip_origin, color: Color(0xFF43A047)),
-                      title: Text(brtStartStation ?? 'tap_select_start'.tr),
+                      leading: const Icon(
+                        Icons.trip_origin,
+                        color: Color(0xFF43A047),
+                      ),
+                      title: Text(
+                        brtStartStation == null
+                            ? 'tap_select_start'.tr
+                            : _getStationDisplayName(brtStartStation),
+                      ),
                       trailing: const Icon(Icons.arrow_drop_down),
                       onTap: () => _openPicker(true),
                     ),
                     const Divider(height: 1),
                     ListTile(
-                      leading: const Icon(Icons.location_on, color: Color(0xFFE53935)),
-                      title: Text(brtEndStation ?? 'tap_select_end'.tr),
+                      leading: const Icon(
+                        Icons.location_on,
+                        color: Color(0xFFE53935),
+                      ),
+                      title: Text(
+                        brtEndStation == null
+                            ? 'tap_select_end'.tr
+                            : _getStationDisplayName(brtEndStation),
+                      ),
                       trailing: const Icon(Icons.arrow_drop_down),
                       onTap: () => _openPicker(false),
                     ),
@@ -98,11 +118,16 @@ class _BrtViewState extends State<BrtView> {
                       child: FilledButton.icon(
                         style: FilledButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                         ),
                         onPressed: _calculateTrip,
                         icon: const Icon(Icons.alt_route_rounded, size: 20),
-                        label: Text('calculate_trip'.tr, style: const TextStyle(fontWeight: FontWeight.bold)),
+                        label: Text(
+                          'calculate_trip'.tr,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
                       ),
                     ),
                   ],
@@ -118,8 +143,12 @@ class _BrtViewState extends State<BrtView> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'fastest_route'.tr,
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: primaryColor),
+                        'transit_directions_BRT'.tr,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                          color: primaryColor,
+                        ),
                       ),
                       const SizedBox(height: 6),
                       Text(
@@ -131,8 +160,12 @@ class _BrtViewState extends State<BrtView> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        '0 ${'transfers_count'.tr} • ${brtTrip!.ticketPrice} ${'ticket'.tr}',
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                        '${brtTrip!.ticketPrice} ${'ticket'.tr}',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          color: primaryColor,
+                        ),
                       ),
                     ],
                   ),

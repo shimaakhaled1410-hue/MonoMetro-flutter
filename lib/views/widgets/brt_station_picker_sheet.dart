@@ -29,7 +29,10 @@ class _BrtStationPickerSheetState extends State<BrtStationPickerSheet> {
 
   List<Station> _getBrtStations() {
     final brtList = MetroData.brtRingRoadNames
-        .map((name) => MetroData.allStations.firstWhereOrNull((s) => s.name == name))
+        .map(
+          (name) =>
+              MetroData.allStations.firstWhereOrNull((s) => s.name == name),
+        )
         .whereType<Station>()
         .toList();
 
@@ -72,7 +75,11 @@ class _BrtStationPickerSheetState extends State<BrtStationPickerSheet> {
               children: [
                 Row(
                   children: [
-                    Icon(Icons.directions_bus_rounded, color: primaryColor, size: 22),
+                    Icon(
+                      Icons.directions_bus_rounded,
+                      color: primaryColor,
+                      size: 22,
+                    ),
                     const SizedBox(width: 8),
                     Text(
                       widget.title,
@@ -97,7 +104,9 @@ class _BrtStationPickerSheetState extends State<BrtStationPickerSheet> {
               controller: _searchController,
               decoration: InputDecoration(
                 filled: true,
-                fillColor: isDark ? const Color(0xFF1E222B) : Colors.grey.shade100,
+                fillColor: isDark
+                    ? const Color(0xFF1E222B)
+                    : Colors.grey.shade100,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
@@ -127,9 +136,12 @@ class _BrtStationPickerSheetState extends State<BrtStationPickerSheet> {
                     ),
                   )
                 : ListView.separated(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
                     itemCount: stations.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 6),
+                    separatorBuilder: (_, _) => const SizedBox(height: 6),
                     itemBuilder: (context, index) {
                       final station = stations[index];
                       final isInterchange = station.lines.length > 1;
@@ -138,19 +150,28 @@ class _BrtStationPickerSheetState extends State<BrtStationPickerSheet> {
                         borderRadius: BorderRadius.circular(12),
                         onTap: () => widget.onSelected(station.name),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 12,
+                          ),
                           decoration: BoxDecoration(
-                            color: isDark ? const Color(0xFF252A36) : const Color(0xFFF9FAFB),
+                            color: isDark
+                                ? const Color(0xFF252A36)
+                                : const Color(0xFFF9FAFB),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
-                              color: isDark ? const Color(0xFF2E3544) : Colors.grey.shade200,
+                              color: isDark
+                                  ? const Color(0xFF2E3544)
+                                  : Colors.grey.shade200,
                             ),
                           ),
                           child: Row(
                             children: [
                               CircleAvatar(
                                 radius: 12,
-                                backgroundColor: primaryColor.withValues(alpha: isDark ? 0.25 : 0.12),
+                                backgroundColor: primaryColor.withValues(
+                                  alpha: isDark ? 0.25 : 0.12,
+                                ),
                                 child: Text(
                                   '${index + 1}',
                                   style: TextStyle(
@@ -167,15 +188,24 @@ class _BrtStationPickerSheetState extends State<BrtStationPickerSheet> {
                                   style: TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w600,
-                                    color: isDark ? Colors.white : Colors.black87,
+                                    color: isDark
+                                        ? Colors.white
+                                        : Colors.black87,
                                   ),
                                 ),
                               ),
                               if (isInterchange)
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 3,
+                                  ),
                                   decoration: BoxDecoration(
-                                    color: isDark ? Colors.amber.shade900.withValues(alpha: 0.3) : Colors.amber.shade100,
+                                    color: isDark
+                                        ? Colors.amber.shade900.withValues(
+                                            alpha: 0.3,
+                                          )
+                                        : Colors.amber.shade100,
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Text(
@@ -183,12 +213,18 @@ class _BrtStationPickerSheetState extends State<BrtStationPickerSheet> {
                                     style: TextStyle(
                                       fontSize: 10,
                                       fontWeight: FontWeight.bold,
-                                      color: isDark ? Colors.amber.shade200 : Colors.amber.shade900,
+                                      color: isDark
+                                          ? Colors.amber.shade200
+                                          : Colors.amber.shade900,
                                     ),
                                   ),
                                 ),
                               const SizedBox(width: 6),
-                              Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey.shade500),
+                              Icon(
+                                Icons.arrow_forward_ios,
+                                size: 14,
+                                color: Colors.grey.shade500,
+                              ),
                             ],
                           ),
                         ),
