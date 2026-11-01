@@ -1,8 +1,10 @@
+import 'dart:collection';
 import '../data/metro_data.dart';
 import '../models/station_model.dart';
-import 'dart:collection';
+import 'fare_calculator_service.dart';
+import 'route_instructions_service.dart';
 
-enum PassengerType { normal, senior, specialNeeds }
+export 'fare_calculator_service.dart' show PassengerType;
 
 class MetroGraphService {
   final Map<String, List<String>> _adjacencyList = {};
@@ -18,10 +20,15 @@ class MetroGraphService {
     _addBidirectionalEdges(MetroData.line3BranchA);
     _addBidirectionalEdges(MetroData.line3BranchB);
     _addBidirectionalEdges(MetroData.monorailEastNames);
+    _addBidirectionalEdges(MetroData.brtRingRoadNames);
+
+    if (MetroData.brtRingRoadNames.isNotEmpty) {
+      _addEdge(MetroData.brtRingRoadNames.first, MetroData.brtRingRoadNames.last);
+      _addEdge(MetroData.brtRingRoadNames.last, MetroData.brtRingRoadNames.first);
+    }
 
     _addTransfer("Kit Kat", ["El-Tawfiqiya", "Sudan"]);
     _addTransfer("Adly Mansour", ["El Haykestep"]);
-    // Walking transfer between Metro Stadium and Monorail Stadium (~4-5 min walk)
     _addTransfer("Stadium", ["Stadium (Monorail)"]);
   }
 
@@ -34,9 +41,7 @@ class MetroGraphService {
 
   void _addEdge(String u, String v) {
     _adjacencyList.putIfAbsent(u, () => []);
-    if (!_adjacencyList[u]!.contains(v)) {
-      _adjacencyList[u]!.add(v);
-    }
+    if (!_adjacencyList[u]!.contains(v)) _adjacencyList[u]!.add(v);
   }
 
   void _addTransfer(String station, List<String> branches) {
@@ -47,106 +52,33 @@ class MetroGraphService {
   }
 
   Station? getStationByName(String name) {
-    final cleanSearch = name
-        .trim()
-        .toLowerCase()
-        .replaceAll('-', ' ')
-        .replaceAll('el ', '')
-        .replaceAll('al ', '');
+    final cleanSearch = name.trim().toLowerCase().replaceAll('-', ' ').replaceAll('el ', '').replaceAll('al ', '');
     try {
       return MetroData.allStations.firstWhere((s) {
-        final cleanStation = s.name
-            .trim()
-            .toLowerCase()
-            .replaceAll('-', ' ')
-            .replaceAll('el ', '')
-            .replaceAll('al ', '');
-        return cleanStation == cleanSearch ||
-            s.name.toLowerCase() == name.trim().toLowerCase();
+        final clean = s.name.trim().toLowerCase().replaceAll('-', ' ').replaceAll('el ', '').replaceAll('al ', '');
+        return clean == cleanSearch || s.name.toLowerCase() == name.trim().toLowerCase();
       });
     } catch (_) {
       return null;
     }
   }
 
-  int calculateTicketPrice(int stationCount, PassengerType type) {
-    if (type == PassengerType.specialNeeds) return 5;
-
-    int normalPrice;
-    if (stationCount <= 9) {
-      normalPrice = 10;
-    } else if (stationCount <= 16) {
-      normalPrice = 12;
-    } else if (stationCount <= 23) {
-      normalPrice = 15;
-    } else {
-      normalPrice = 20;
-    }
-
-    if (type == PassengerType.senior) {
-      return (normalPrice / 2).ceil();
-    }
-    return normalPrice;
-  }
-
   int countTransfers(List<String> path) {
     if (path.length < 2) return 0;
     int transfers = 0;
-    String currentLine = _getCommonLine(path[0], path[1]);
+    String curLine = RouteInstructionsService.getCommonLine(getStationByName(path[0]), getStationByName(path[1]));
 
     for (int i = 1; i < path.length - 1; i++) {
-      String nextLine = _getCommonLine(path[i], path[i + 1]);
-      if (currentLine != nextLine &&
-          nextLine.isNotEmpty &&
-          currentLine.isNotEmpty) {
+      String nextLine = RouteInstructionsService.getCommonLine(getStationByName(path[i]), getStationByName(path[i + 1]));
+      if (curLine != nextLine && nextLine.isNotEmpty && curLine.isNotEmpty) {
         transfers++;
-        currentLine = nextLine;
+        curLine = nextLine;
       }
     }
     return transfers;
   }
 
-  String _getCommonLine(String s1Name, String s2Name) {
-    final s1 = getStationByName(s1Name);
-    final s2 = getStationByName(s2Name);
-    if (s1 == null || s2 == null) return '';
-    final common = s1.lines.where((l) => s2.lines.contains(l)).toList();
-    return common.isNotEmpty ? common.first : '';
-  }
-
-  List<String> generateInstructions(List<Station> path) {
-    if (path.length < 2) return [];
-    List<String> steps = [];
-    String currentLine = _getCommonLine(path[0].name, path[1].name);
-    steps.add('Start at ${path[0].localizedName} ($currentLine)');
-
-    for (int i = 1; i < path.length - 1; i++) {
-      final currName = path[i].name;
-      final nextName = path[i + 1].name;
-
-      if ((currName == "Stadium" && nextName == "Stadium (Monorail)") ||
-          (currName == "Stadium (Monorail)" && nextName == "Stadium")) {
-        steps.add('Exit and walk ~5 mins to ${path[i + 1].localizedName}');
-        currentLine = _getCommonLine(currName, nextName);
-        continue;
-      }
-
-      String nextLine = _getCommonLine(currName, nextName);
-      if (currentLine != nextLine && nextLine.isNotEmpty) {
-        steps.add('Transfer at ${path[i].localizedName} to $nextLine');
-        currentLine = nextLine;
-      }
-    }
-    steps.add('Arrive at destination: ${path.last.localizedName}');
-    return steps;
-  }
-
-  TripResult? calculateTrip(
-    String start,
-    String end,
-    PassengerType passengerType, {
-    bool preferFewerTransfers = false,
-  }) {
+  TripResult? calculateTrip(String start, String end, PassengerType passengerType, {bool preferFewerTransfers = false}) {
     if (start == end) {
       final s = getStationByName(start);
       if (s == null) return null;
@@ -154,15 +86,14 @@ class MetroGraphService {
         path: [s],
         stationCount: 1,
         estimatedTimeMinutes: 0,
-        ticketPrice: calculateTotalTripFare([s], passengerType),
+        ticketPrice: FareCalculatorService.calculateTotalFare([s], passengerType),
         instructions: ['You are already at the destination'],
         transferCount: 0,
       );
     }
 
     List<List<String>> allPaths = [];
-    Queue<List<String>> queue = Queue();
-    queue.add([start]);
+    Queue<List<String>> queue = Queue()..add([start]);
 
     while (queue.isNotEmpty && allPaths.length < 25) {
       List<String> current = queue.removeFirst();
@@ -174,7 +105,7 @@ class MetroGraphService {
       }
 
       for (String neighbor in _adjacencyList[last] ?? []) {
-        if (!current.contains(neighbor) && current.length <= 65) {
+        if (!current.contains(neighbor) && current.length <= 80) {
           queue.add(List.from(current)..add(neighbor));
         }
       }
@@ -182,124 +113,40 @@ class MetroGraphService {
 
     if (allPaths.isEmpty) return null;
 
-    if (preferFewerTransfers) {
-      allPaths.sort((a, b) {
-        int tA = countTransfers(a);
-        int tB = countTransfers(b);
-        if (tA != tB) return tA.compareTo(tB);
-        return a.length.compareTo(b.length);
-      });
-    } else {
-      allPaths.sort((a, b) {
-        if (a.length != b.length) return a.length.compareTo(b.length);
-        return countTransfers(a).compareTo(countTransfers(b));
-      });
-    }
+    allPaths.sort((a, b) {
+      if (preferFewerTransfers) {
+        int tA = countTransfers(a), tB = countTransfers(b);
+        return tA != tB ? tA.compareTo(tB) : a.length.compareTo(b.length);
+      }
+      return a.length != b.length ? a.length.compareTo(b.length) : countTransfers(a).compareTo(countTransfers(b));
+    });
 
-    final chosenPathNames = allPaths.first;
-    final path = chosenPathNames
-        .map((name) => getStationByName(name)!)
-        .toList();
-    final stationCount = path.length;
-    final transfers = countTransfers(chosenPathNames);
+    final chosenPath = allPaths.first.map((name) => getStationByName(name)!).toList();
+    final transfers = countTransfers(allPaths.first);
 
-    int metroMoves = 0;
-    int monorailMoves = 0;
-    bool hasMonorailTransfer = false;
-
-    for (int i = 0; i < path.length - 1; i++) {
-      final current = path[i];
-      final next = path[i + 1];
-
-      final isCurMono = current.lines.contains("Monorail East");
-      final isNextMono = next.lines.contains("Monorail East");
-
-      if (isCurMono && isNextMono) {
+    int metroMoves = 0, monorailMoves = 0, brtMoves = 0;
+    for (int i = 0; i < chosenPath.length - 1; i++) {
+      final cur = chosenPath[i];
+      final nxt = chosenPath[i + 1];
+      if (cur.lines.contains("BRT Ring Road") && nxt.lines.contains("BRT Ring Road")) {
+        brtMoves++;
+      } else if (cur.lines.contains("Monorail East") && nxt.lines.contains("Monorail East")) {
         monorailMoves++;
-      } else if (!isCurMono && !isNextMono) {
+      } else {
         metroMoves++;
-      } else {
-        hasMonorailTransfer = true;
       }
     }
 
-    // 3 mins per metro station, 4 mins per monorail station
-    // 7 mins for metro-metro transfer, 10 mins for metro-monorail transfer
-    int transferTime = 0;
-    if (transfers > 0) {
-      if (hasMonorailTransfer) {
-        transferTime = 10 + ((transfers - 1) * 7);
-      } else {
-        transferTime = transfers * 7;
-      }
-    }
-
-    final time = (metroMoves * 3) + (monorailMoves * 4) + transferTime;
+    int transferTime = transfers * 7;
+    int totalTime = (metroMoves * 3) + (monorailMoves * 4) + (brtMoves * 4) + transferTime;
 
     return TripResult(
-      path: path,
-      stationCount: stationCount,
-      estimatedTimeMinutes: time,
-      ticketPrice: calculateTotalTripFare(path, passengerType),
-      instructions: generateInstructions(path),
+      path: chosenPath,
+      stationCount: chosenPath.length,
+      estimatedTimeMinutes: totalTime,
+      ticketPrice: FareCalculatorService.calculateTotalFare(chosenPath, passengerType),
+      instructions: RouteInstructionsService.build(chosenPath),
       transferCount: transfers,
     );
-  }
-
-  int calculateMonorailPrice(int stationCount, PassengerType type) {
-    if (stationCount <= 0) return 0;
-    if (type == PassengerType.specialNeeds) return 5;
-
-    int normalPrice;
-    if (stationCount <= 5) {
-      normalPrice = 20;
-    } else if (stationCount <= 10) {
-      normalPrice = 40;
-    } else if (stationCount <= 15) {
-      normalPrice = 55;
-    } else {
-      normalPrice = 80;
-    }
-
-    if (type == PassengerType.senior) {
-      return (normalPrice / 2).ceil();
-    }
-    return normalPrice;
-  }
-
-  int calculateTotalTripFare(List<Station> path, PassengerType passengerType) {
-    if (path.isEmpty) return 0;
-    if (path.length == 1) return 0;
-
-    int metroMovements = 0;
-    int monorailMovements = 0;
-
-    for (int i = 0; i < path.length - 1; i++) {
-      final current = path[i];
-      final next = path[i + 1];
-
-      if (current.lines.contains("Monorail East") &&
-          next.lines.contains("Monorail East")) {
-        monorailMovements++;
-      } else if (!current.lines.contains("Monorail East") &&
-          !next.lines.contains("Monorail East")) {
-        metroMovements++;
-      }
-    }
-
-    int metroPrice = 0;
-    if (metroMovements > 0) {
-      metroPrice = calculateTicketPrice(metroMovements + 1, passengerType);
-    }
-
-    int monorailPrice = 0;
-    if (monorailMovements > 0) {
-      monorailPrice = calculateMonorailPrice(
-        monorailMovements + 1,
-        passengerType,
-      );
-    }
-
-    return metroPrice + monorailPrice;
   }
 }

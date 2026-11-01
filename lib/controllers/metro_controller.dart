@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+import 'package:metro/services/fare_calculator_service.dart';
 import 'package:metro/utils/app_snackbar.dart';
 import '../data/metro_data.dart';
 import '../models/station_model.dart';
@@ -143,23 +144,27 @@ class MetroController extends GetxController {
 
     int mCount = 0;
     int monoCount = 0;
+
     for (var s in trip.path) {
       if (s.lines.contains("Monorail East")) {
         monoCount++;
-      } else {
+      } else if (!s.lines.contains("BRT Ring Road")) {
         mCount++;
       }
     }
 
     final double calculatedMetroPrice = mCount > 0
-        ? _graphService
-              .calculateTicketPrice(mCount, passengerType.value)
-              .toDouble()
+        ? FareCalculatorService.calculateMetroFare(
+            mCount,
+            passengerType.value,
+          ).toDouble()
         : 0.0;
+
     final double calculatedMonoPrice = monoCount > 0
-        ? _graphService
-              .calculateMonorailPrice(monoCount, passengerType.value)
-              .toDouble()
+        ? FareCalculatorService.calculateMonorailFare(
+            monoCount,
+            passengerType.value,
+          ).toDouble()
         : 0.0;
 
     final historyItem = TripHistory(
@@ -229,7 +234,6 @@ class MetroController extends GetxController {
       isLoadingLocation.value = false;
     }
   }
-
 
   Future<void> showNearestStationPicker() async {
     final serviceEnabled = await Geolocator.isLocationServiceEnabled();
