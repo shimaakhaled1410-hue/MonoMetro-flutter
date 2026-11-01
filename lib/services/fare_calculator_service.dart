@@ -44,13 +44,19 @@ class FareCalculatorService {
 
     int price;
     if (stationCount <= 4) {
+      price = 5;
+    } else if (stationCount <= 10) {
       price = 10;
-    } else if (stationCount <= 9) {
+    } else if (stationCount <= 14) {
       price = 15;
-    } else if (stationCount <= 16) {
+    } else if (stationCount <= 18) {
       price = 20;
-    } else {
+    } else if (stationCount <= 22) {
       price = 25;
+    } else if (stationCount <= 26) {
+      price = 30;
+    } else {
+      price = 35;
     }
 
     return type == PassengerType.senior ? (price / 2).ceil() : price;
