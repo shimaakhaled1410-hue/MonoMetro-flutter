@@ -20,12 +20,6 @@ class MetroGraphService {
     _addBidirectionalEdges(MetroData.line3BranchA);
     _addBidirectionalEdges(MetroData.line3BranchB);
     _addBidirectionalEdges(MetroData.monorailEastNames);
-    _addBidirectionalEdges(MetroData.brtRingRoadNames);
-
-    if (MetroData.brtRingRoadNames.isNotEmpty) {
-      _addEdge(MetroData.brtRingRoadNames.first, MetroData.brtRingRoadNames.last);
-      _addEdge(MetroData.brtRingRoadNames.last, MetroData.brtRingRoadNames.first);
-    }
 
     _addTransfer("Kit Kat", ["El-Tawfiqiya", "Sudan"]);
     _addTransfer("Adly Mansour", ["El Haykestep"]);
@@ -51,21 +45,15 @@ class MetroGraphService {
     }
   }
 
- Station? getStationByName(String name) {
+  Station? getStationByName(String name) {
+    final cleanSearch = name.trim().toLowerCase().replaceAll('-', ' ').replaceAll('el ', '').replaceAll('al ', '');
     try {
-      return MetroData.allStations.firstWhere(
-        (s) => s.name.toLowerCase() == name.trim().toLowerCase(),
-      );
+      return MetroData.allStations.firstWhere((s) {
+        final clean = s.name.trim().toLowerCase().replaceAll('-', ' ').replaceAll('el ', '').replaceAll('al ', '');
+        return clean == cleanSearch || s.name.toLowerCase() == name.trim().toLowerCase();
+      });
     } catch (_) {
-      final cleanSearch = name.trim().toLowerCase().replaceAll('-', ' ').replaceAll('el ', '').replaceAll('al ', '');
-      try {
-        return MetroData.allStations.firstWhere((s) {
-          final clean = s.name.trim().toLowerCase().replaceAll('-', ' ').replaceAll('el ', '').replaceAll('al ', '');
-          return clean == cleanSearch;
-        });
-      } catch (_) {
-        return null;
-      }
+      return null;
     }
   }
 
@@ -111,7 +99,7 @@ class MetroGraphService {
       }
 
       for (String neighbor in _adjacencyList[last] ?? []) {
-        if (!current.contains(neighbor) && current.length <= 80) {
+        if (!current.contains(neighbor) && current.length <= 60) {
           queue.add(List.from(current)..add(neighbor));
         }
       }
@@ -127,19 +115,17 @@ class MetroGraphService {
       return a.length != b.length ? a.length.compareTo(b.length) : countTransfers(a).compareTo(countTransfers(b));
     });
 
-   final chosenPath = allPaths.first
+    final chosenPath = allPaths.first
         .map((name) => getStationByName(name))
         .whereType<Station>()
         .toList();
     final transfers = countTransfers(allPaths.first);
 
-    int metroMoves = 0, monorailMoves = 0, brtMoves = 0;
+    int metroMoves = 0, monorailMoves = 0;
     for (int i = 0; i < chosenPath.length - 1; i++) {
       final cur = chosenPath[i];
       final nxt = chosenPath[i + 1];
-      if (cur.lines.contains("BRT Ring Road") && nxt.lines.contains("BRT Ring Road")) {
-        brtMoves++;
-      } else if (cur.lines.contains("Monorail East") && nxt.lines.contains("Monorail East")) {
+      if (cur.lines.contains("Monorail East") && nxt.lines.contains("Monorail East")) {
         monorailMoves++;
       } else {
         metroMoves++;
@@ -147,7 +133,7 @@ class MetroGraphService {
     }
 
     int transferTime = transfers * 7;
-    int totalTime = (metroMoves * 3) + (monorailMoves * 4) + (brtMoves * 4) + transferTime;
+    int totalTime = (metroMoves * 3) + (monorailMoves * 4) + transferTime;
 
     return TripResult(
       path: chosenPath,

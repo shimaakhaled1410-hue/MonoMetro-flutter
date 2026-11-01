@@ -6,13 +6,11 @@ import '../../models/station_model.dart';
 class StationPickerSheet extends StatefulWidget {
   final String title;
   final Function(String stationName) onSelected;
-  final int? initialLineIndex;
 
   const StationPickerSheet({
     super.key,
     required this.title,
     required this.onSelected,
-    this.initialLineIndex,
   });
 
   @override
@@ -29,16 +27,11 @@ class _StationPickerSheetState extends State<StationPickerSheet>
   static const Color line2Color = Color(0xFFE53935);
   static const Color line3Color = Color(0xFF43A047);
   static const Color monorailColor = Color(0xFF00897B);
-  static const Color brtColor = Color(0xFFF39C12);
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(
-      length: 5,
-      vsync: this,
-      initialIndex: widget.initialLineIndex ?? 0,
-    );
+    _tabController = TabController(length: 4, vsync: this);
   }
 
   @override
@@ -60,10 +53,8 @@ class _StationPickerSheetState extends State<StationPickerSheet>
         ...MetroData.line3BranchA,
         ...MetroData.line3BranchB,
       }.toList();
-    } else if (lineIndex == 3) {
-      names = MetroData.monorailEastNames;
     } else {
-      names = MetroData.brtRingRoadNames;
+      names = MetroData.monorailEastNames;
     }
 
     return names
@@ -74,13 +65,14 @@ class _StationPickerSheetState extends State<StationPickerSheet>
 
   List<Station> _getAllSearchResults() {
     final query = _searchQuery.trim().toLowerCase();
-    return MetroData.allStations.where((s) {
+    return MetroData.allStations
+        .where((s) => !s.lines.contains('BRT Ring Road'))
+        .where((s) {
       return s.name.toLowerCase().contains(query) || s.nameAr.contains(query);
     }).toList();
   }
 
   Color _getStationColor(Station station) {
-    if (station.lines.contains('BRT Ring Road')) return brtColor;
     if (station.lines.contains('Line 1')) return line1Color;
     if (station.lines.contains('Line 2')) return line2Color;
     if (station.lines.contains('Line 3')) return line3Color;
@@ -89,7 +81,7 @@ class _StationPickerSheetState extends State<StationPickerSheet>
 
   Widget _buildStationTile(Station station, Color indicatorColor) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final isInterchange = station.lines.length > 1;
+    final isInterchange = station.lines.where((l) => l != 'BRT Ring Road').length > 1;
 
     return InkWell(
       borderRadius: BorderRadius.circular(12),
@@ -126,7 +118,7 @@ class _StationPickerSheetState extends State<StationPickerSheet>
                   if (_searchQuery.isNotEmpty) ...[
                     const SizedBox(height: 2),
                     Text(
-                      station.lines.join(' | '),
+                      station.lines.where((l) => l != 'BRT Ring Road').join(' | '),
                       style: TextStyle(fontSize: 11, color: Colors.grey.shade500),
                     ),
                   ],
@@ -269,7 +261,6 @@ class _StationPickerSheetState extends State<StationPickerSheet>
                 Tab(child: Row(children: [const CircleAvatar(radius: 4, backgroundColor: line2Color), const SizedBox(width: 6), Text('line_2'.tr)])),
                 Tab(child: Row(children: [const CircleAvatar(radius: 4, backgroundColor: line3Color), const SizedBox(width: 6), Text('line_3'.tr)])),
                 Tab(child: Row(children: [const CircleAvatar(radius: 4, backgroundColor: monorailColor), const SizedBox(width: 6), Text('monorail_line'.tr)])),
-                Tab(child: Row(children: [const CircleAvatar(radius: 4, backgroundColor: brtColor), const SizedBox(width: 6), Text('brt'.tr)])),
               ],
             ),
             const SizedBox(height: 8),
@@ -281,7 +272,6 @@ class _StationPickerSheetState extends State<StationPickerSheet>
                   _buildLineList(1, line2Color),
                   _buildLineList(2, line3Color),
                   _buildLineList(3, monorailColor),
-                  _buildLineList(4, brtColor),
                 ],
               ),
             ),

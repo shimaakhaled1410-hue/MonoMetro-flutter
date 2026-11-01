@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:metro/views/brt_view.dart';
+import 'brt_view.dart';
 import 'history_view.dart';
 import 'home_view.dart';
 import 'settings_view.dart';
@@ -69,7 +69,7 @@ class _MainNavigationViewState extends State<MainNavigationView> {
                     label: 'nav_brt'.tr,
                     icon: Icons.directions_bus_outlined,
                     activeIcon: Icons.directions_bus_rounded,
-                    primaryColor: const Color(0xFFF39C12),
+                    primaryColor: primaryColor,
                     isDark: isDark,
                   ),
                 ),
