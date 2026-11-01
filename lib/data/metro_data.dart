@@ -925,8 +925,8 @@ class MetroData {
       lines: ["BRT Ring Road"],
     ),
     Station(
-      name: "El Zahraa",
-      nameAr: "الزهراء",
+      name: "El Zahraa (BRT)",
+      nameAr: "الزهراء (BRT)",
       latitude: 29.9720,
       longitude: 31.2650,
       lines: ["BRT Ring Road"],
@@ -1083,18 +1083,17 @@ class MetroData {
     "Misr Mosque",
     "Justice City",
   ];
-
- static const List<String> brtRingRoadNames = [
+  static const List<String> brtRingRoadNames = [
     "Adly Mansour",
     "Al Asher Station",
     "Belbeis Road",
     "El Salam",
-    "Al Marg",
+    "El Marg",
     "Moassasat El Zakat",
     "El Khosos",
     "Mostorod",
     "Bahteem",
-    "Shubra El-Kheima",
+    "Shubra El Kheima",
     "Om Bayoumi",
     "Alexandria Agricultural Road",
     "Warraq",
@@ -1113,7 +1112,7 @@ class MetroData {
     "Faisal",
     "Tersa",
     "Al Qasabgi",
-    "El Moneeb",
+    "El Mounib",
     "Bahr El Aazam",
     "Corniche El Nile",
     "El Zahraa",

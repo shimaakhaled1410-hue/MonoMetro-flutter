@@ -6,8 +6,13 @@ import '../../utils/app_themes.dart';
 
 class VerticalTimeline extends StatelessWidget {
   final TripResult trip;
+  final Color? lineColor;
 
-  const VerticalTimeline({super.key, required this.trip});
+  const VerticalTimeline({
+    super.key,
+    required this.trip,
+    this.lineColor,
+  });
 
   String _getCommonLine(Station s1, Station s2) {
     final common = s1.lines.where((l) => s2.lines.contains(l)).toList();
@@ -22,6 +27,8 @@ class VerticalTimeline extends StatelessWidget {
       lineList = MetroData.line2Names;
     } else if (line == 'Monorail East') {
       lineList = MetroData.monorailEastNames;
+    } else if (line == 'BRT Ring Road') {
+      lineList = MetroData.brtRingRoadNames;
     } else {
       if (MetroData.line3BranchA.contains(next.name)) {
         return MetroData.allStations
@@ -54,7 +61,7 @@ class VerticalTimeline extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    const timelineColor = AppThemes.timelineColor;
+    final timelineColor = lineColor ?? AppThemes.timelineColor;
 
     return Card(
       child: Padding(
@@ -67,7 +74,7 @@ class VerticalTimeline extends StatelessWidget {
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
-                color: Theme.of(context).colorScheme.primary,
+                color: timelineColor,
               ),
             ),
             const SizedBox(height: 12),
@@ -124,27 +131,13 @@ class VerticalTimeline extends StatelessWidget {
                   }
                 } else if (transferLine != null &&
                     index + 1 < trip.path.length) {
-                  if (isWalkingTransfer && index + 2 < trip.path.length) {
-                    final nextStation = trip.path[index + 1];
-                    final afterNextStation = trip.path[index + 2];
-                    final line = _getCommonLine(nextStation, afterNextStation);
-                    final dir = _getTrainDirection(
-                      line,
-                      nextStation,
-                      afterNextStation,
-                    );
-                    if (dir.isNotEmpty) {
-                      directionInfo = '${'take_line_towards'.tr} $dir';
-                    }
-                  } else {
-                    final dir = _getTrainDirection(
-                      transferLine,
-                      station,
-                      trip.path[index + 1],
-                    );
-                    if (dir.isNotEmpty) {
-                      directionInfo = '${'take_line_towards'.tr} $dir';
-                    }
+                  final dir = _getTrainDirection(
+                    transferLine,
+                    station,
+                    trip.path[index + 1],
+                  );
+                  if (dir.isNotEmpty) {
+                    directionInfo = '${'take_line_towards'.tr} $dir';
                   }
                 }
 
@@ -185,10 +178,10 @@ class VerticalTimeline extends StatelessWidget {
                                 color: isInterchange
                                     ? Colors.amber.shade700
                                     : ((isFirst || isLast)
-                                          ? timelineColor
-                                          : (isDark
-                                                ? const Color(0xFF1E222B)
-                                                : Colors.white)),
+                                        ? timelineColor
+                                        : (isDark
+                                            ? const Color(0xFF1E222B)
+                                            : Colors.white)),
                                 border: Border.all(
                                   color: isInterchange
                                       ? Colors.amber.shade300
@@ -226,8 +219,8 @@ class VerticalTimeline extends StatelessWidget {
                                         fontSize: 15,
                                         fontWeight:
                                             (isFirst || isLast || isInterchange)
-                                            ? FontWeight.bold
-                                            : FontWeight.w600,
+                                                ? FontWeight.bold
+                                                : FontWeight.w600,
                                       ),
                                     ),
                                   ),
@@ -238,16 +231,15 @@ class VerticalTimeline extends StatelessWidget {
                                         vertical: 3,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: isDark
-                                            ? const Color(0xFF2C3240)
-                                            : Colors.grey.shade200,
+                                        color: timelineColor.withValues(alpha: 0.15),
                                         borderRadius: BorderRadius.circular(12),
                                       ),
                                       child: Text(
                                         'Start'.tr,
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 11,
                                           fontWeight: FontWeight.bold,
+                                          color: timelineColor,
                                         ),
                                       ),
                                     ),
@@ -258,16 +250,15 @@ class VerticalTimeline extends StatelessWidget {
                                         vertical: 3,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: isDark
-                                            ? const Color(0xFF2C3240)
-                                            : Colors.grey.shade200,
+                                        color: timelineColor.withValues(alpha: 0.15),
                                         borderRadius: BorderRadius.circular(12),
                                       ),
                                       child: Text(
                                         'End'.tr,
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 11,
                                           fontWeight: FontWeight.bold,
+                                          color: timelineColor,
                                         ),
                                       ),
                                     ),
@@ -275,151 +266,55 @@ class VerticalTimeline extends StatelessWidget {
                               ),
                               if (transferLine != null) ...[
                                 const SizedBox(height: 6),
-                                Wrap(
-                                  spacing: 6,
-                                  runSpacing: 4,
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 8,
-                                        vertical: 3,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: timelineColor,
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          const Icon(
-                                            Icons.transfer_within_a_station,
-                                            color: Colors.white,
-                                            size: 13,
-                                          ),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            '${'transfer'.tr} $transferLine',
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 11,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 8,
-                                        vertical: 3,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: isDark
-                                            ? Colors.orange.shade900.withValues(
-                                                alpha: 0.35,
-                                              )
-                                            : Colors.orange.shade100,
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Icon(
-                                            Icons.directions_walk,
-                                            size: 13,
-                                            color: isDark
-                                                ? Colors.orange.shade200
-                                                : Colors.orange.shade900,
-                                          ),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            'interchange_walk'.tr,
-                                            style: TextStyle(
-                                              color: isDark
-                                                  ? Colors.orange.shade200
-                                                  : Colors.orange.shade900,
-                                              fontSize: 11,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                              if (walkingTransferCustomNote != null) ...[
-                                const SizedBox(height: 6),
                                 Container(
-                                  width: double.infinity,
                                   padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 7,
+                                    horizontal: 8,
+                                    vertical: 3,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: isDark
-                                        ? const Color(0xFF2C2215)
-                                        : const Color(0xFFFFF8E1),
-                                    borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(
-                                      color: Colors.amber.shade700.withValues(
-                                        alpha: 0.4,
-                                      ),
-                                      width: 1,
-                                    ),
+                                    color: timelineColor,
+                                    borderRadius: BorderRadius.circular(10),
                                   ),
                                   child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      Icon(
-                                        Icons.directions_walk_rounded,
-                                        size: 16,
-                                        color: Colors.amber.shade800,
+                                      const Icon(
+                                        Icons.transfer_within_a_station,
+                                        color: Colors.white,
+                                        size: 13,
                                       ),
-                                      const SizedBox(width: 6),
-                                      Expanded(
-                                        child: Text(
-                                          walkingTransferCustomNote,
-                                          style: TextStyle(
-                                            fontSize: 11.5,
-                                            fontWeight: FontWeight.w600,
-                                            color: isDark
-                                                ? Colors.amber.shade100
-                                                : Colors.brown.shade800,
-                                            height: 1.35,
-                                          ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        '${'transfer'.tr} $transferLine',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.bold,
                                         ),
                                       ),
                                     ],
                                   ),
                                 ),
                               ],
+                              if (walkingTransferCustomNote != null) ...[
+                                const SizedBox(height: 6),
+                                Text(
+                                  walkingTransferCustomNote,
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.orange,
+                                  ),
+                                ),
+                              ],
                               if (directionInfo != null) ...[
                                 const SizedBox(height: 5),
-                                Row(
-                                  children: [
-                                    Icon(
-                                      Icons.navigation_outlined,
-                                      size: 14,
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.primary,
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Flexible(
-                                      child: Text(
-                                        directionInfo,
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w600,
-                                          color: Theme.of(
-                                            context,
-                                          ).colorScheme.primary,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                                Text(
+                                  directionInfo,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: timelineColor,
+                                  ),
                                 ),
                               ],
                             ],

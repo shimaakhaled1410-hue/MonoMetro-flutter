@@ -6,11 +6,13 @@ import '../../models/station_model.dart';
 class StationPickerSheet extends StatefulWidget {
   final String title;
   final Function(String stationName) onSelected;
+  final int? initialLineIndex;
 
   const StationPickerSheet({
     super.key,
     required this.title,
     required this.onSelected,
+    this.initialLineIndex,
   });
 
   @override
@@ -27,11 +29,16 @@ class _StationPickerSheetState extends State<StationPickerSheet>
   static const Color line2Color = Color(0xFFE53935);
   static const Color line3Color = Color(0xFF43A047);
   static const Color monorailColor = Color(0xFF00897B);
+  static const Color brtColor = Color(0xFFF39C12);
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(
+      length: 5,
+      vsync: this,
+      initialIndex: widget.initialLineIndex ?? 0,
+    );
   }
 
   @override
@@ -53,14 +60,15 @@ class _StationPickerSheetState extends State<StationPickerSheet>
         ...MetroData.line3BranchA,
         ...MetroData.line3BranchB,
       }.toList();
-    } else {
+    } else if (lineIndex == 3) {
       names = MetroData.monorailEastNames;
+    } else {
+      names = MetroData.brtRingRoadNames;
     }
 
     return names
-        .map(
-          (name) => MetroData.allStations.firstWhere((st) => st.name == name),
-        )
+        .map((name) => MetroData.allStations.firstWhereOrNull((st) => st.name == name))
+        .whereType<Station>()
         .toList();
   }
 
@@ -72,6 +80,7 @@ class _StationPickerSheetState extends State<StationPickerSheet>
   }
 
   Color _getStationColor(Station station) {
+    if (station.lines.contains('BRT Ring Road')) return brtColor;
     if (station.lines.contains('Line 1')) return line1Color;
     if (station.lines.contains('Line 2')) return line2Color;
     if (station.lines.contains('Line 3')) return line3Color;
@@ -99,10 +108,7 @@ class _StationPickerSheetState extends State<StationPickerSheet>
             Container(
               width: 10,
               height: 10,
-              decoration: BoxDecoration(
-                color: indicatorColor,
-                shape: BoxShape.circle,
-              ),
+              decoration: BoxDecoration(color: indicatorColor, shape: BoxShape.circle),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -121,10 +127,7 @@ class _StationPickerSheetState extends State<StationPickerSheet>
                     const SizedBox(height: 2),
                     Text(
                       station.lines.join(' | '),
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: Colors.grey.shade500,
-                      ),
+                      style: TextStyle(fontSize: 11, color: Colors.grey.shade500),
                     ),
                   ],
                 ],
@@ -134,9 +137,7 @@ class _StationPickerSheetState extends State<StationPickerSheet>
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: isDark
-                      ? Colors.amber.shade900.withValues(alpha: 0.3)
-                      : Colors.amber.shade100,
+                  color: isDark ? Colors.amber.shade900.withValues(alpha: 0.3) : Colors.amber.shade100,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
@@ -144,18 +145,12 @@ class _StationPickerSheetState extends State<StationPickerSheet>
                   style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
-                    color: isDark
-                        ? Colors.amber.shade200
-                        : Colors.amber.shade900,
+                    color: isDark ? Colors.amber.shade200 : Colors.amber.shade900,
                   ),
                 ),
               ),
             const SizedBox(width: 6),
-            Icon(
-              Icons.arrow_forward_ios,
-              size: 14,
-              color: Colors.grey.shade500,
-            ),
+            Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey.shade500),
           ],
         ),
       ),
@@ -169,9 +164,7 @@ class _StationPickerSheetState extends State<StationPickerSheet>
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       itemCount: stations.length,
       separatorBuilder: (_, _) => const SizedBox(height: 6),
-      itemBuilder: (context, index) {
-        return _buildStationTile(stations[index], lineColor);
-      },
+      itemBuilder: (context, index) => _buildStationTile(stations[index], lineColor),
     );
   }
 
@@ -180,10 +173,7 @@ class _StationPickerSheetState extends State<StationPickerSheet>
 
     if (results.isEmpty) {
       return Center(
-        child: Text(
-          'no_trips'.tr,
-          style: TextStyle(color: Colors.grey.shade500),
-        ),
+        child: Text('no_trips'.tr, style: TextStyle(color: Colors.grey.shade500)),
       );
     }
 
@@ -248,13 +238,8 @@ class _StationPickerSheetState extends State<StationPickerSheet>
               controller: _searchController,
               decoration: InputDecoration(
                 filled: true,
-                fillColor: isDark
-                    ? const Color(0xFF1E222B)
-                    : Colors.grey.shade100,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
+                fillColor: isDark ? const Color(0xFF1E222B) : Colors.grey.shade100,
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
                 hintText: 'search_station'.tr,
                 prefixIcon: const Icon(Icons.search, size: 20),
                 suffixIcon: _searchQuery.isNotEmpty
@@ -280,58 +265,11 @@ class _StationPickerSheetState extends State<StationPickerSheet>
               tabAlignment: TabAlignment.start,
               labelStyle: const TextStyle(fontWeight: FontWeight.bold),
               tabs: [
-                Tab(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const CircleAvatar(
-                        radius: 4,
-                        backgroundColor: line1Color,
-                      ),
-                      const SizedBox(width: 6),
-                      Text('line_1'.tr),
-                    ],
-                  ),
-                ),
-                Tab(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const CircleAvatar(
-                        radius: 4,
-                        backgroundColor: line2Color,
-                      ),
-                      const SizedBox(width: 6),
-                      Text('line_2'.tr),
-                    ],
-                  ),
-                ),
-                Tab(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const CircleAvatar(
-                        radius: 4,
-                        backgroundColor: line3Color,
-                      ),
-                      const SizedBox(width: 6),
-                      Text('line_3'.tr),
-                    ],
-                  ),
-                ),
-                Tab(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const CircleAvatar(
-                        radius: 4,
-                        backgroundColor: monorailColor,
-                      ),
-                      const SizedBox(width: 6),
-                      Text('monorail_line'.tr),
-                    ],
-                  ),
-                ),
+                Tab(child: Row(children: [const CircleAvatar(radius: 4, backgroundColor: line1Color), const SizedBox(width: 6), Text('line_1'.tr)])),
+                Tab(child: Row(children: [const CircleAvatar(radius: 4, backgroundColor: line2Color), const SizedBox(width: 6), Text('line_2'.tr)])),
+                Tab(child: Row(children: [const CircleAvatar(radius: 4, backgroundColor: line3Color), const SizedBox(width: 6), Text('line_3'.tr)])),
+                Tab(child: Row(children: [const CircleAvatar(radius: 4, backgroundColor: monorailColor), const SizedBox(width: 6), Text('monorail_line'.tr)])),
+                Tab(child: Row(children: [const CircleAvatar(radius: 4, backgroundColor: brtColor), const SizedBox(width: 6), Text('brt'.tr)])),
               ],
             ),
             const SizedBox(height: 8),
@@ -343,6 +281,7 @@ class _StationPickerSheetState extends State<StationPickerSheet>
                   _buildLineList(1, line2Color),
                   _buildLineList(2, line3Color),
                   _buildLineList(3, monorailColor),
+                  _buildLineList(4, brtColor),
                 ],
               ),
             ),

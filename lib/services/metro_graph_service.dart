@@ -51,15 +51,21 @@ class MetroGraphService {
     }
   }
 
-  Station? getStationByName(String name) {
-    final cleanSearch = name.trim().toLowerCase().replaceAll('-', ' ').replaceAll('el ', '').replaceAll('al ', '');
+ Station? getStationByName(String name) {
     try {
-      return MetroData.allStations.firstWhere((s) {
-        final clean = s.name.trim().toLowerCase().replaceAll('-', ' ').replaceAll('el ', '').replaceAll('al ', '');
-        return clean == cleanSearch || s.name.toLowerCase() == name.trim().toLowerCase();
-      });
+      return MetroData.allStations.firstWhere(
+        (s) => s.name.toLowerCase() == name.trim().toLowerCase(),
+      );
     } catch (_) {
-      return null;
+      final cleanSearch = name.trim().toLowerCase().replaceAll('-', ' ').replaceAll('el ', '').replaceAll('al ', '');
+      try {
+        return MetroData.allStations.firstWhere((s) {
+          final clean = s.name.trim().toLowerCase().replaceAll('-', ' ').replaceAll('el ', '').replaceAll('al ', '');
+          return clean == cleanSearch;
+        });
+      } catch (_) {
+        return null;
+      }
     }
   }
 
@@ -121,7 +127,10 @@ class MetroGraphService {
       return a.length != b.length ? a.length.compareTo(b.length) : countTransfers(a).compareTo(countTransfers(b));
     });
 
-    final chosenPath = allPaths.first.map((name) => getStationByName(name)!).toList();
+   final chosenPath = allPaths.first
+        .map((name) => getStationByName(name))
+        .whereType<Station>()
+        .toList();
     final transfers = countTransfers(allPaths.first);
 
     int metroMoves = 0, monorailMoves = 0, brtMoves = 0;
