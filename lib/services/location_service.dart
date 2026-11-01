@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:geolocator/geolocator.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../data/metro_data.dart';
@@ -18,7 +17,6 @@ class LandmarkItem {
 }
 
 class LocationService {
-
   static const List<LandmarkItem> popularPlacesList = [
     LandmarkItem(
       titleEn: 'Abbas El Akkad',
@@ -168,6 +166,8 @@ class LocationService {
     'شبرا': 'Shubra',
     'شبرا الخيمة': 'Shubra',
     'المظلات': 'Mezallat',
+    'التجمع': 'One Ninety',
+    'الدائري': 'Adly Mansour',
   };
 
   static Station? resolveStationByKeyword(String keyword) {
@@ -182,45 +182,30 @@ class LocationService {
   }
 
   static Future<bool> openStationOnMap(Station station) async {
-    final urlString =
-        'https://www.google.com/maps/search/?api=1&query=${station.latitude},${station.longitude}';
-    final uri = Uri.parse(urlString);
-
+    final uri = Uri.parse(
+      'https://www.google.com/maps/search/?api=1&query=${station.latitude},${station.longitude}',
+    );
     try {
       final launched = await launchUrl(
         uri,
         mode: LaunchMode.externalApplication,
       );
-      if (!launched) {
-        return await launchUrl(uri, mode: LaunchMode.platformDefault);
-      }
-      return launched;
+      return launched
+          ? true
+          : await launchUrl(uri, mode: LaunchMode.platformDefault);
     } catch (_) {
-      try {
-        return await launchUrl(uri, mode: LaunchMode.platformDefault);
-      } catch (_) {
-        return false;
-      }
+      return false;
     }
   }
 
   static Future<Position?> getCurrentPosition() async {
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      return null;
-    }
-
+    if (!await Geolocator.isLocationServiceEnabled()) return null;
     LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        return null;
-      }
+      if (permission == LocationPermission.denied) return null;
     }
-
-    if (permission == LocationPermission.deniedForever) {
-      return null;
-    }
+    if (permission == LocationPermission.deniedForever) return null;
 
     return await Geolocator.getCurrentPosition(
       locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
@@ -230,31 +215,25 @@ class LocationService {
   static Station findNearestStation(
     double latitude,
     double longitude, {
-    String? filterType, // 'metro', 'monorail', or null for all
+    String? filterType,
   }) {
     List<Station> stations = MetroData.allStations;
 
     if (filterType == 'metro') {
       stations = stations
-          .where(
-            (s) =>
-                !s.name.toLowerCase().contains('monorail') &&
-                !s.nameAr.contains('مونوريل'),
-          )
+          .where((s) => s.lines.any((l) => l.startsWith('Line')))
           .toList();
     } else if (filterType == 'monorail') {
       stations = stations
-          .where(
-            (s) =>
-                s.name.toLowerCase().contains('monorail') ||
-                s.nameAr.contains('مونوريل'),
-          )
+          .where((s) => s.lines.contains('Monorail East'))
+          .toList();
+    } else if (filterType == 'brt') {
+      stations = stations
+          .where((s) => s.lines.contains('BRT Ring Road'))
           .toList();
     }
 
-    if (stations.isEmpty) {
-      stations = MetroData.allStations;
-    }
+    if (stations.isEmpty) stations = MetroData.allStations;
 
     Station nearest = stations.first;
     double minDistance = double.infinity;
@@ -266,13 +245,11 @@ class LocationService {
         station.latitude,
         station.longitude,
       );
-
       if (distance < minDistance) {
         minDistance = distance;
         nearest = station;
       }
     }
-
     return nearest;
   }
 }

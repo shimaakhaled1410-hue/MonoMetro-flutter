@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:metro/views/brt_view.dart';
 import 'history_view.dart';
 import 'home_view.dart';
 import 'settings_view.dart';
@@ -16,6 +17,7 @@ class _MainNavigationViewState extends State<MainNavigationView> {
 
   final List<Widget> _screens = [
     HomeView(),
+    const BrtView(),
     const HistoryView(),
     const SettingsView(),
   ];
@@ -64,6 +66,16 @@ class _MainNavigationViewState extends State<MainNavigationView> {
                 Expanded(
                   child: _buildNavItem(
                     index: 1,
+                    label: 'nav_brt'.tr,
+                    icon: Icons.directions_bus_outlined,
+                    activeIcon: Icons.directions_bus_rounded,
+                    primaryColor: const Color(0xFFF39C12),
+                    isDark: isDark,
+                  ),
+                ),
+                Expanded(
+                  child: _buildNavItem(
+                    index: 2,
                     label: 'nav_history'.tr,
                     icon: Icons.history_rounded,
                     activeIcon: Icons.manage_history_rounded,
@@ -73,7 +85,7 @@ class _MainNavigationViewState extends State<MainNavigationView> {
                 ),
                 Expanded(
                   child: _buildNavItem(
-                    index: 2,
+                    index: 3,
                     label: 'nav_settings'.tr,
                     icon: Icons.settings_outlined,
                     activeIcon: Icons.settings_rounded,
@@ -108,7 +120,7 @@ class _MainNavigationViewState extends State<MainNavigationView> {
         children: [
           AnimatedContainer(
             duration: const Duration(milliseconds: 200),
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
             decoration: BoxDecoration(
               color: isSelected
                   ? primaryColor.withValues(alpha: isDark ? 0.25 : 0.12)
@@ -126,8 +138,10 @@ class _MainNavigationViewState extends State<MainNavigationView> {
           const SizedBox(height: 3),
           Text(
             label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
-              fontSize: 12,
+              fontSize: 11,
               fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
               color: isSelected
                   ? primaryColor

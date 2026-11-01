@@ -1,17 +1,11 @@
-import 'dart:async';
-
-import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
-import 'package:metro/services/fare_calculator_service.dart';
-import 'package:metro/utils/app_snackbar.dart';
 import '../data/metro_data.dart';
 import '../models/station_model.dart';
-import '../models/trip_history_model.dart';
-import '../services/history_service.dart';
 import '../services/location_service.dart';
 import '../services/metro_graph_service.dart';
-import 'history_controller.dart';
+import '../utils/app_snackbar.dart';
+import 'helpers/metro_location_helper.dart';
+import 'helpers/trip_saver_helper.dart';
 
 class MetroController extends GetxController {
   final MetroGraphService _graphService = MetroGraphService();
@@ -25,27 +19,17 @@ class MetroController extends GetxController {
   var selectedRouteIndex = 0.obs;
 
   var isLoadingLocation = false.obs;
-
-  var searchPlaceText = ''.obs;
   final RxnString selectedDestinationTag = RxnString();
 
   List<Station> get allStations => MetroData.allStations;
-
-  Station? get selectedStartStation => startStationName.value.isEmpty
-      ? null
-      : _graphService.getStationByName(startStationName.value);
-
-  Station? get selectedEndStation => endStationName.value.isEmpty
-      ? null
-      : _graphService.getStationByName(endStationName.value);
-
+  Station? get selectedStartStation =>
+      startStationName.value.isEmpty ? null : _graphService.getStationByName(startStationName.value);
+  Station? get selectedEndStation =>
+      endStationName.value.isEmpty ? null : _graphService.getStationByName(endStationName.value);
   TripResult? get activeTrip =>
       selectedRouteIndex.value == 0 ? fastestTrip.value : comfortableTrip.value;
 
-  void selectStartStation(String name) {
-    startStationName.value = name;
-  }
-
+  void selectStartStation(String name) => startStationName.value = name;
   void selectEndStation(String name, {String? tag}) {
     endStationName.value = name;
     selectedDestinationTag.value = tag;
@@ -57,67 +41,42 @@ class MetroController extends GetxController {
     startStationName.value = endStationName.value;
     endStationName.value = temp;
     selectedDestinationTag.value = null;
-
-    if (startStationName.value.isNotEmpty && endStationName.value.isNotEmpty) {
-      calculateTrip();
-    }
+    if (startStationName.value.isNotEmpty && endStationName.value.isNotEmpty) calculateTrip();
   }
 
   void setPassengerType(PassengerType type) {
     passengerType.value = type;
-    if (startStationName.value.isNotEmpty && endStationName.value.isNotEmpty) {
-      calculateTrip();
-    }
+    if (startStationName.value.isNotEmpty && endStationName.value.isNotEmpty) calculateTrip();
   }
 
-  void selectRouteOption(int index) {
-    selectedRouteIndex.value = index;
-  }
+  void selectRouteOption(int index) => selectedRouteIndex.value = index;
 
   void calculateTrip() {
     if (startStationName.value.isEmpty || endStationName.value.isEmpty) {
-      AppSnackbar.warning(
-        title: 'warning'.tr,
-        message: 'select_both_stations'.tr,
-      );
+      AppSnackbar.warning(title: 'warning'.tr, message: 'select_both_stations'.tr);
       return;
     }
-
     if (startStationName.value == endStationName.value) {
       fastestTrip.value = null;
       comfortableTrip.value = null;
-      AppSnackbar.warning(
-        title: 'metro_title'.tr,
-        message: 'same_station_error'.tr,
-      );
+      AppSnackbar.warning(title: 'metro_title'.tr, message: 'same_station_error'.tr);
       return;
     }
-
-    final isStadiumInterchange =
-        (startStationName.value == "Stadium" &&
-            endStationName.value == "Stadium (Monorail)") ||
-        (startStationName.value == "Stadium (Monorail)" &&
-            endStationName.value == "Stadium");
-
-    if (isStadiumInterchange) {
+    if ((startStationName.value == "Stadium" && endStationName.value == "Stadium (Monorail)") ||
+        (startStationName.value == "Stadium (Monorail)" && endStationName.value == "Stadium")) {
       fastestTrip.value = null;
       comfortableTrip.value = null;
-      AppSnackbar.warning(
-        title: 'notice'.tr,
-        message: 'stadium_walk_notice'.tr,
-      );
+      AppSnackbar.warning(title: 'notice'.tr, message: 'stadium_walk_notice'.tr);
       return;
     }
 
     selectedRouteIndex.value = 0;
-
     fastestTrip.value = _graphService.calculateTrip(
       startStationName.value,
       endStationName.value,
       passengerType.value,
       preferFewerTransfers: false,
     );
-
     comfortableTrip.value = _graphService.calculateTrip(
       startStationName.value,
       endStationName.value,
@@ -126,205 +85,39 @@ class MetroController extends GetxController {
     );
 
     if (fastestTrip.value != null && comfortableTrip.value != null) {
-      final minFare =
-          fastestTrip.value!.ticketPrice < comfortableTrip.value!.ticketPrice
+      final minFare = fastestTrip.value!.ticketPrice < comfortableTrip.value!.ticketPrice
           ? fastestTrip.value!.ticketPrice
           : comfortableTrip.value!.ticketPrice;
-
       fastestTrip.value = fastestTrip.value!.copyWith(ticketPrice: minFare);
-      comfortableTrip.value = comfortableTrip.value!.copyWith(
-        ticketPrice: minFare,
-      );
+      comfortableTrip.value = comfortableTrip.value!.copyWith(ticketPrice: minFare);
     }
   }
 
   void saveActiveTrip() {
-    final trip = activeTrip;
-    if (trip == null) return;
-
-    int mCount = 0;
-    int monoCount = 0;
-
-    for (var s in trip.path) {
-      if (s.lines.contains("Monorail East")) {
-        monoCount++;
-      } else if (!s.lines.contains("BRT Ring Road")) {
-        mCount++;
-      }
-    }
-
-    final double calculatedMetroPrice = mCount > 0
-        ? FareCalculatorService.calculateMetroFare(
-            mCount,
-            passengerType.value,
-          ).toDouble()
-        : 0.0;
-
-    final double calculatedMonoPrice = monoCount > 0
-        ? FareCalculatorService.calculateMonorailFare(
-            monoCount,
-            passengerType.value,
-          ).toDouble()
-        : 0.0;
-
-    final historyItem = TripHistory(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
+    if (activeTrip == null) return;
+    TripSaverHelper.save(
+      trip: activeTrip!,
       startStation: startStationName.value,
       endStation: endStationName.value,
-      stationCount: trip.stationCount,
-      timeInMinutes: trip.estimatedTimeMinutes,
-      price: trip.ticketPrice.toDouble(),
-      metroPrice: calculatedMetroPrice,
-      monorailPrice: calculatedMonoPrice,
-      timestamp: DateTime.now(),
-      routeStations: trip.path.map((s) => s.name).toList(),
       passengerType: passengerType.value,
       destinationTag: selectedDestinationTag.value,
     );
-
-    HistoryService.saveTrip(historyItem).then((_) {
-      if (Get.isRegistered<HistoryController>()) {
-        Get.find<HistoryController>().loadHistory();
-      }
-      AppSnackbar.success(
-        title: 'metro_title'.tr,
-        message: 'trip_saved_success'.tr,
-      );
-    });
   }
 
   void openStartStationMap() {
     if (selectedStartStation != null) {
       LocationService.openStationOnMap(selectedStartStation!);
     } else {
-      AppSnackbar.warning(
-        title: 'metro_title'.tr,
-        message: 'select_dep_station'.tr,
-      );
+      AppSnackbar.warning(title: 'metro_title'.tr, message: 'select_dep_station'.tr);
     }
   }
 
-  Future<void> findNearestToCurrentLocation(String filterType) async {
-    final serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      AppSnackbar.warning(
-        title: 'location_notice_title'.tr,
-        message: 'location_notice_desc'.tr,
+  Future<void> findNearestToCurrentLocation(String filterType) => MetroLocationHelper.findNearest(
+        filterType: filterType,
+        isLoading: isLoadingLocation,
+        onStationFound: (name) => startStationName.value = name,
       );
-      return;
-    }
 
-    isLoadingLocation.value = true;
-    try {
-      final pos = await LocationService.getCurrentPosition();
-      if (pos != null) {
-        final nearest = LocationService.findNearestStation(
-          pos.latitude,
-          pos.longitude,
-          filterType: filterType,
-        );
-        startStationName.value = nearest.name;
-      }
-    } catch (_) {
-      AppSnackbar.error(
-        title: 'no_internet_search_title'.tr,
-        message: 'no_internet_search_desc'.tr,
-      );
-    } finally {
-      isLoadingLocation.value = false;
-    }
-  }
-
-  Future<void> showNearestStationPicker() async {
-    final serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      AppSnackbar.warning(
-        title: 'location_notice_title'.tr,
-        message: 'location_notice_desc'.tr,
-      );
-      return;
-    }
-
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        AppSnackbar.error(
-          title: 'location_permission_title'.tr,
-          message: 'location_permission_denied'.tr,
-        );
-        return;
-      }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      AppSnackbar.error(
-        title: 'location_permission_title'.tr,
-        message: 'location_permission_denied_forever'.tr,
-      );
-      return;
-    }
-
-    Get.bottomSheet(
-      Material(
-        color: Get.theme.scaffoldBackgroundColor,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                'select_transit_type'.tr,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'choose_transit_type_desc'.tr,
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
-              ),
-              const SizedBox(height: 20),
-              ListTile(
-                leading: const Icon(
-                  Icons.subway_rounded,
-                  color: Color(0xFF1F5F5B),
-                ),
-                title: Text('metro'.tr),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                tileColor: Colors.grey.withValues(alpha: 0.08),
-                onTap: () {
-                  Get.back();
-                  findNearestToCurrentLocation('metro');
-                },
-              ),
-              const SizedBox(height: 10),
-              ListTile(
-                leading: const Icon(
-                  Icons.train_rounded,
-                  color: Color(0xFFFD5E5C),
-                ),
-                title: Text('monorail'.tr),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                tileColor: Colors.grey.withValues(alpha: 0.08),
-                onTap: () {
-                  Get.back();
-                  findNearestToCurrentLocation('monorail');
-                },
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+  Future<void> showNearestStationPicker() =>
+      MetroLocationHelper.showPicker((type) => findNearestToCurrentLocation(type));
 }
