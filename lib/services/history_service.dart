@@ -1,46 +1,31 @@
 import 'dart:convert';
+
+import 'package:metro/core/constants/storage_keys.dart';
+import 'package:metro/models/trip_history.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../models/trip_history_model.dart';
 
 class HistoryService {
-  static const String _key = 'metro_trips_history';
+  const HistoryService._();
 
-  static Future<List<TripHistory>> getHistory() async {
+  static Future<List<TripHistory>> load() async {
     final prefs = await SharedPreferences.getInstance();
-    final List<String> list = prefs.getStringList(_key) ?? [];
-    return list
-        .map(
-          (item) =>
-              TripHistory.fromJson(jsonDecode(item) as Map<String, dynamic>),
-        )
-        .toList();
+    final raw = prefs.getStringList(StorageKeys.tripHistory) ?? const [];
+    final trips = <TripHistory>[];
+    for (final item in raw) {
+      try {
+        trips.add(
+          TripHistory.fromJson(jsonDecode(item) as Map<String, dynamic>),
+        );
+      } catch (_) {
+        continue;
+      }
+    }
+    return trips;
   }
 
-  static Future<void> saveTrip(TripHistory trip) async {
+  static Future<void> saveAll(List<TripHistory> trips) async {
     final prefs = await SharedPreferences.getInstance();
-    final List<String> list = prefs.getStringList(_key) ?? [];
-    list.insert(0, jsonEncode(trip.toJson()));
-    await prefs.setStringList(_key, list);
-  }
-
-  static Future<void> saveAllTrips(List<TripHistory> trips) async {
-    final prefs = await SharedPreferences.getInstance();
-    final List<String> list = trips.map((t) => jsonEncode(t.toJson())).toList();
-    await prefs.setStringList(_key, list);
-  }
-
-  static Future<void> deleteTrip(String id) async {
-    final prefs = await SharedPreferences.getInstance();
-    final List<String> list = prefs.getStringList(_key) ?? [];
-    final updatedList = list.where((item) {
-      final decoded = jsonDecode(item) as Map<String, dynamic>;
-      return decoded['id'] != id;
-    }).toList();
-    await prefs.setStringList(_key, updatedList);
-  }
-
-  static Future<void> clearAll() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_key);
+    final encoded = trips.map((trip) => jsonEncode(trip.toJson())).toList();
+    await prefs.setStringList(StorageKeys.tripHistory, encoded);
   }
 }

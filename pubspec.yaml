@@ -10,18 +10,13 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  # State Management & Navigation
+  flutter_localizations:
+    sdk: flutter
+  intl: any
   get: ^4.6.6
-
-  # Device Location & Search
   geolocator: ^14.0.0
-
-  # Open Maps
   url_launcher: ^6.3.0
-
-  # Local Storage for History
   shared_preferences: ^2.3.2
-
   cupertino_icons: ^1.0.8
   device_preview: ^1.3.1
 

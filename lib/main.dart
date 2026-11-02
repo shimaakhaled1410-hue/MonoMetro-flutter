@@ -2,60 +2,17 @@ import 'package:device_preview/device_preview.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:metro/views/splash_view.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'controllers/theme_controller.dart';
-import 'controllers/metro_controller.dart';
-import 'utils/app_themes.dart';
-import 'utils/app_translations.dart';
+import 'package:metro/app/app.dart';
+import 'package:metro/services/settings_service.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  final prefs = await SharedPreferences.getInstance();
-  final isDark = prefs.getBool('isDarkMode') ?? false;
-  final savedLanguage = prefs.getString('languageCode') ?? 'en';
-
-  Get.put(ThemeController());
-  Get.put(MetroController());
+  await Get.putAsync<SettingsService>(() => SettingsService().init());
 
   runApp(
     DevicePreview(
-      enabled: !kReleaseMode,
-      builder: (context) => MonoMetroApp(
-        initialThemeMode: isDark ? ThemeMode.dark : ThemeMode.light,
-        initialLocale: Locale(savedLanguage),
-      ),
+      enabled: kDebugMode,
+      builder: (_) => const MonoMetroApp(),
     ),
   );
-}
-
-class MonoMetroApp extends StatelessWidget {
-  final ThemeMode initialThemeMode;
-  final Locale initialLocale;
-
-  const MonoMetroApp({
-    super.key,
-    required this.initialThemeMode,
-    required this.initialLocale,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GetMaterialApp(
-      useInheritedMediaQuery: true,
-      locale: initialLocale,
-      builder: DevicePreview.appBuilder,
-      debugShowCheckedModeBanner: false,
-      title: 'MonoMetro',
-      translations: AppTranslations(),
-      fallbackLocale: const Locale('en', 'US'),
-      theme: AppThemes.lightTheme,
-      darkTheme: AppThemes.darkTheme,
-      themeMode: initialThemeMode,
-      defaultTransition: Transition.fadeIn,
-      transitionDuration: const Duration(milliseconds: 250),
-      home: const SplashView(),
-    );
-  }
 }
