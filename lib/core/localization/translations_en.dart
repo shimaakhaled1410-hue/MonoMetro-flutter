@@ -67,6 +67,7 @@ const Map<String, String> translationsEn = {
   'stadium_walk_notice':
       'You are already at Stadium! You can walk between the Metro and Monorail stations in about @minutes minutes without taking a train.',
   'take_line_towards': 'Take train towards',
+  'take_bus_towards': 'Take bus towards',
   'start': 'Start',
   'end': 'End',
   'monorail_to_metro_walk':

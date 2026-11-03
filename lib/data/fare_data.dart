@@ -26,11 +26,5 @@ class FareData {
       FareTier(15, 55),
       FareTier(unlimited, 80),
     ],
-    TransitMode.brt: [
-      FareTier(4, 10),
-      FareTier(9, 15),
-      FareTier(16, 20),
-      FareTier(unlimited, 25),
-    ],
   };
 }

@@ -13,6 +13,7 @@ class TimelineEntry {
   bool isLast = false;
   TransitLine? transferTo;
   Station? towards;
+  TransitLine? travelLine;
   String? walkNoteKey;
   int walkMinutes = 0;
   Color incomingColor = AppColors.timeline;
@@ -49,6 +50,7 @@ class TimelineEntry {
         final line = segment.line!;
         if (j == 0) {
           entry.towards = segment.towards;
+          entry.travelLine = line;
           if (joinsPrevious && !trip.segments[i - 1].isWalk) {
             entry.transferTo = line;
           }

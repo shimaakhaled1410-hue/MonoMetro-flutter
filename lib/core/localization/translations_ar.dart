@@ -68,6 +68,7 @@ const Map<String, String> translationsAr = {
   'stadium_walk_notice':
       'أنت بالفعل في منطقة الإستاد! يمكنك الانتقال بين محطتي المترو والمونوريل سيراً خلال @minutes دقائق تقريباً دون الحاجة لركوب قطار.',
   'take_line_towards': 'اركب قطار اتجاه',
+  'take_bus_towards': 'اركب الأتوبيس اتجاه',
   'start': 'البداية',
   'end': 'النهاية',
   'monorail_to_metro_walk':
@@ -92,8 +93,7 @@ const Map<String, String> translationsAr = {
   'location_permission_denied_forever':
       'صلاحيات الموقع مرفوضة تماماً من إعدادات الهاتف.',
   'location_error_title': 'خطأ في تحديد الموقع',
-  'location_error_desc':
-      'تعذر تحديد موقعك. حاول مرة أخرى في مكان مفتوح.',
+  'location_error_desc': 'تعذر تحديد موقعك. حاول مرة أخرى في مكان مفتوح.',
   'select_transit_type': 'اختر نوع وسيلة النقل',
   'choose_transit_type_desc': 'اختر وسيلة النقل لتحديد أقرب محطة إليك',
   'metro': 'مترو الأنفاق',

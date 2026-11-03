@@ -20,8 +20,18 @@ class RouteOptionCard extends StatelessWidget {
   final bool isSelected;
   final VoidCallback onTap;
 
+  String? _details() {
+    final parts = <String>[
+      if (trip.transferCount > 0)
+        '${trip.transferCount} ${'transfers_count'.tr}',
+      ?FareFormatter.format(trip.fare),
+    ];
+    return parts.isEmpty ? null : parts.join(' • ');
+  }
+
   @override
   Widget build(BuildContext context) {
+    final details = _details();
     final isDark = context.isDark;
     final primary = context.brand;
 
@@ -64,15 +74,17 @@ class RouteOptionCard extends StatelessWidget {
                   color: isSelected ? Colors.white70 : context.mutedColor,
                 ),
               ),
-              const SizedBox(height: 4),
-              Text(
-                '${trip.transferCount} ${'transfers_count'.tr} • ${FareFormatter.format(trip.fare)}',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 12,
-                  color: isSelected ? Colors.white : context.onSurfaceStrong,
+              if (details != null) ...[
+                const SizedBox(height: 4),
+                Text(
+                  details,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                    color: isSelected ? Colors.white : context.onSurfaceStrong,
+                  ),
                 ),
-              ),
+              ],
             ],
           ),
         ),

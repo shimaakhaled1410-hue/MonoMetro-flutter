@@ -81,11 +81,16 @@ class TripHistoryCard extends StatelessWidget {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: badgeColor.withValues(alpha: isDark ? 0.2 : 0.1),
                     borderRadius: BorderRadius.circular(4),
-                    border: Border.all(color: badgeColor.withValues(alpha: 0.3)),
+                    border: Border.all(
+                      color: badgeColor.withValues(alpha: 0.3),
+                    ),
                   ),
                   child: Text(
                     item.passengerType.labelKey.tr,
@@ -104,7 +109,11 @@ class TripHistoryCard extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              '${item.stationCount} ${'stations'.tr} • ${formatTripDuration(item.timeInMinutes)} • ${FareFormatter.format(item.fare)}',
+              [
+                '${item.stationCount} ${'stations'.tr}',
+                formatTripDuration(item.timeInMinutes),
+                ?FareFormatter.format(item.fare),
+              ].join(' • '),
               style: const TextStyle(fontWeight: FontWeight.w500),
             ),
             const SizedBox(height: 12),
@@ -130,8 +139,9 @@ class TripHistoryCard extends StatelessWidget {
                       routeNames[index],
                       style: const TextStyle(fontSize: 12),
                     ),
-                    backgroundColor:
-                        isDark ? AppColors.fieldDark : Colors.grey.shade100,
+                    backgroundColor: isDark
+                        ? AppColors.fieldDark
+                        : Colors.grey.shade100,
                     side: BorderSide.none,
                   ),
                 ),

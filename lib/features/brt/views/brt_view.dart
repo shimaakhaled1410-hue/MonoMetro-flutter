@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:metro/features/brt/widgets/brt_planner_card.dart';
 import 'package:metro/features/planner/controllers/metro_controller.dart';
-import 'package:metro/features/planner/widgets/passenger_badge_card.dart';
 import 'package:metro/features/planner/widgets/trip_results_section.dart';
 import 'package:metro/models/transit_network.dart';
 
@@ -20,8 +19,6 @@ class BrtView extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const PassengerBadgeCard(),
-            const SizedBox(height: 12),
             BrtPlannerCard(controller: controller),
             const SizedBox(height: 16),
             TripResultsSection(controller: controller),

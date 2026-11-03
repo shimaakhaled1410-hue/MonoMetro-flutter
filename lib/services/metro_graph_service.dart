@@ -122,7 +122,8 @@ class MetroGraphService {
       return null;
     }
 
-    final transferCost = LinesData.transferMinutes +
+    final transferCost =
+        LinesData.transferMinutes +
         (preference == RoutingPreference.comfortable
             ? _comfortTransferPenalty
             : 0);
