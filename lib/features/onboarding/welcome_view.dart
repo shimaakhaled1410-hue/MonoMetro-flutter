@@ -105,8 +105,9 @@ class WelcomeView extends StatelessWidget {
               ),
               const SizedBox(height: 32),
               Expanded(
-                child: Obx(
-                  () => ListView.separated(
+                child: Obx(() {
+                  final selectedType = controller.passengerType.value;
+                  return ListView.separated(
                     itemCount: _categories.length,
                     separatorBuilder: (_, _) => const SizedBox(height: 12),
                     itemBuilder: (_, index) {
@@ -115,19 +116,20 @@ class WelcomeView extends StatelessWidget {
                         title: category.titleKey.tr,
                         subtitle: category.descriptionKey.tr,
                         icon: category.icon,
-                        isSelected:
-                            controller.passengerType.value == category.type,
+                        isSelected: selectedType == category.type,
                         onTap: () => controller.setPassengerType(category.type),
                       );
                     },
-                  ),
-                ),
+                  );
+                }),
               ),
               const SizedBox(height: 12),
               FilledButton(
                 style: FilledButton.styleFrom(
                   backgroundColor: primary,
-                  foregroundColor: context.isDark ? Colors.black87 : Colors.white,
+                  foregroundColor: context.isDark
+                      ? Colors.black87
+                      : Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),

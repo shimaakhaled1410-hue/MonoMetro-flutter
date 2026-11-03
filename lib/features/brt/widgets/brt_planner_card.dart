@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:metro/core/constants/app_colors.dart';
-import 'package:metro/core/utils/theme_extensions.dart';
 import 'package:metro/features/planner/controllers/metro_controller.dart';
 import 'package:metro/features/planner/widgets/calculate_trip_button.dart';
 import 'package:metro/features/planner/widgets/station_picker_sheet.dart';
@@ -46,11 +45,6 @@ class BrtPlannerCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: context.surfaceColor,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(color: AppColors.brt, width: 1.2),
-      ),
       child: Padding(
         padding: const EdgeInsets.all(14),
         child: Column(
@@ -73,10 +67,7 @@ class BrtPlannerCard extends StatelessWidget {
               isStart: false,
             ),
             const SizedBox(height: 10),
-            CalculateTripButton(
-              color: AppColors.brt,
-              onPressed: controller.calculateTrip,
-            ),
+            CalculateTripButton(onPressed: controller.calculateTrip),
           ],
         ),
       ),

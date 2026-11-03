@@ -8,13 +8,11 @@ class _NavDestination {
     required this.labelKey,
     required this.icon,
     required this.activeIcon,
-    this.color,
   });
 
   final String labelKey;
   final IconData icon;
   final IconData activeIcon;
-  final Color? color;
 }
 
 class AppBottomNavBar extends StatelessWidget {
@@ -37,7 +35,6 @@ class AppBottomNavBar extends StatelessWidget {
       labelKey: 'nav_brt',
       icon: Icons.directions_bus_outlined,
       activeIcon: Icons.directions_bus_rounded,
-      color: AppColors.brt,
     ),
     _NavDestination(
       labelKey: 'nav_history',
@@ -108,7 +105,7 @@ class _NavItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDark;
-    final accent = destination.color ?? context.brand;
+    final accent = context.brand;
     final inactive = context.mutedColor;
     final label = destination.labelKey.tr;
 
@@ -128,7 +125,10 @@ class _NavItem extends StatelessWidget {
             children: [
               AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: isSelected
                       ? accent.withValues(alpha: isDark ? 0.25 : 0.12)
