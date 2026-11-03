@@ -12,10 +12,8 @@ class AppThemes {
   static final ThemeData darkTheme = _build(AppPalette.dark, Brightness.dark);
 
   static ThemeData _build(AppPalette p, Brightness brightness) {
-    final isDark = brightness == Brightness.dark;
-    final barForeground = isDark ? p.text : p.brand;
-    final roundedShape = RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(12),
+    final buttonShape = RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(14),
     );
 
     final scheme = ColorScheme.fromSeed(
@@ -43,32 +41,36 @@ class AppThemes {
         elevation: 0,
         color: p.surface,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(20),
           side: BorderSide(color: p.border),
         ),
       ),
       appBarTheme: AppBarTheme(
-        backgroundColor: p.surface,
-        foregroundColor: barForeground,
+        backgroundColor: p.scaffold,
+        foregroundColor: p.text,
         elevation: 0,
         scrolledUnderElevation: 0,
-        centerTitle: true,
+        centerTitle: false,
         titleTextStyle: TextStyle(
-          color: barForeground,
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
+          color: p.text,
+          fontSize: 22,
+          fontWeight: FontWeight.w700,
+          letterSpacing: -0.2,
         ),
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           backgroundColor: p.cta,
           foregroundColor: p.onCta,
-          shape: roundedShape,
+          minimumSize: const Size(0, 52),
+          shape: buttonShape,
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: p.brand,
+          minimumSize: const Size(0, 48),
+          shape: buttonShape,
           side: BorderSide(color: p.borderStrong),
         ),
       ),
@@ -78,24 +80,35 @@ class AppThemes {
       chipTheme: ChipThemeData(
         backgroundColor: p.field,
         side: BorderSide.none,
+        shape: const StadiumBorder(),
         labelStyle: TextStyle(color: p.text),
       ),
       dividerTheme: DividerThemeData(color: p.border, thickness: 1),
       dialogTheme: DialogThemeData(
         backgroundColor: p.surface,
         surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(28),
+        ),
       ),
       bottomSheetTheme: BottomSheetThemeData(
         backgroundColor: p.scaffold,
         modalBackgroundColor: p.scaffold,
         surfaceTintColor: Colors.transparent,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        ),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: p.field,
         hintStyle: TextStyle(color: p.muted),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide.none,
         ),
       ),
