@@ -9,13 +9,12 @@ class FareCalculatorService {
 
   static int fareFor(TransitMode mode, int stationCount, PassengerType type) {
     if (stationCount < 2) return 0;
-    if (type == PassengerType.specialNeeds) return FareData.specialNeedsFare;
 
-    final tiers = FareData.tiers[mode];
-    if (tiers == null) return 0;
-    final price = tiers
-        .firstWhere((tier) => stationCount <= tier.maxStations)
-        .price;
+    final tiers = FareData.tiers[mode]!;
+    final price = tiers.firstWhere((tier) => stationCount <= tier.maxStations).price;
+    if (mode == TransitMode.brt) return price;
+
+    if (type == PassengerType.specialNeeds) return FareData.specialNeedsFare;
     return type == PassengerType.senior ? (price + 1) ~/ 2 : price;
   }
 
@@ -48,10 +47,6 @@ class FareCalculatorService {
         continue;
       }
       final segmentMode = segment.line!.mode;
-      if (!FareData.tiers.containsKey(segmentMode)) {
-        flush();
-        continue;
-      }
       if (currentMode != segmentMode) {
         flush();
         currentMode = segmentMode;

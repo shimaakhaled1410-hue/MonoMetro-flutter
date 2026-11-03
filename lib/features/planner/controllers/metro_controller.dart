@@ -18,9 +18,9 @@ class MetroController extends GetxController {
     required MetroGraphService graphService,
     required PassengerController passengerController,
     required HistoryController historyController,
-  }) : _graph = graphService,
-       _passenger = passengerController,
-       _history = historyController;
+  })  : _graph = graphService,
+        _passenger = passengerController,
+        _history = historyController;
 
   static MetroController of(TransitNetwork network) {
     return Get.find<MetroController>(tag: network.name);
@@ -89,6 +89,8 @@ class MetroController extends GetxController {
   }
 
   void _refreshTrips() {
+    if (network != TransitNetwork.rail) return;
+
     final start = startStation.value;
     final end = endStation.value;
     if (fastestTrip.value != null && start != null && end != null) {
@@ -131,7 +133,10 @@ class MetroController extends GetxController {
     _computeTrips(start, end);
 
     if (fastestTrip.value == null) {
-      AppSnackbar.error(title: 'metro_title'.tr, message: 'no_route_found'.tr);
+      AppSnackbar.error(
+        title: 'metro_title'.tr,
+        message: 'no_route_found'.tr,
+      );
     }
   }
 
@@ -153,7 +158,10 @@ class MetroController extends GetxController {
   Future<void> openStationOnMap(Station station) async {
     final opened = await MapLauncherService.openStation(station);
     if (!opened) {
-      AppSnackbar.error(title: 'metro_title'.tr, message: 'map_open_failed'.tr);
+      AppSnackbar.error(
+        title: 'metro_title'.tr,
+        message: 'map_open_failed'.tr,
+      );
     }
   }
 
@@ -196,17 +204,17 @@ class MetroController extends GetxController {
   (String, String) _locationMessage(LocationFailure? failure) {
     return switch (failure) {
       LocationFailure.serviceDisabled => (
-        'location_notice_title',
-        'location_notice_desc',
-      ),
+          'location_notice_title',
+          'location_notice_desc',
+        ),
       LocationFailure.permissionDenied => (
-        'location_permission_title',
-        'location_permission_denied',
-      ),
+          'location_permission_title',
+          'location_permission_denied',
+        ),
       LocationFailure.permissionDeniedForever => (
-        'location_permission_title',
-        'location_permission_denied_forever',
-      ),
+          'location_permission_title',
+          'location_permission_denied_forever',
+        ),
       _ => ('location_error_title', 'location_error_desc'),
     };
   }
