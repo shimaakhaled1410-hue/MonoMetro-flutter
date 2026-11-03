@@ -127,7 +127,7 @@ class WelcomeView extends StatelessWidget {
               FilledButton(
                 style: FilledButton.styleFrom(
                   backgroundColor: primary,
-                  foregroundColor: context.isDark ? Colors.black87 : Colors.white,
+                  foregroundColor: context.palette.onBrand,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),

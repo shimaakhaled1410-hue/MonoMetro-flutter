@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:metro/core/constants/app_colors.dart';
 import 'package:metro/core/utils/theme_extensions.dart';
 
 class CalculateTripButton extends StatelessWidget {
@@ -11,15 +10,15 @@ class CalculateTripButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final background =
-        color ?? (context.isDark ? AppColors.selectedRouteDark : context.brand);
+    final palette = context.palette;
+    final background = color ?? palette.cta;
 
     return SizedBox(
       width: double.infinity,
       child: FilledButton.icon(
         style: FilledButton.styleFrom(
           backgroundColor: background,
-          foregroundColor: Colors.white,
+          foregroundColor: palette.onCta,
           padding: const EdgeInsets.symmetric(vertical: 14),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),

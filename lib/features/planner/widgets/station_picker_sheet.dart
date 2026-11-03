@@ -108,7 +108,7 @@ class _StationPickerSheetState extends State<StationPickerSheet>
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF333B4D) : Colors.grey.shade300,
+                color: context.palette.borderStrong,
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
@@ -123,7 +123,7 @@ class _StationPickerSheetState extends State<StationPickerSheet>
                       style: TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : primary,
+                        color: isDark ? context.onSurfaceStrong : primary,
                       ),
                     ),
                   ),
@@ -140,9 +140,7 @@ class _StationPickerSheetState extends State<StationPickerSheet>
                 controller: _searchController,
                 decoration: InputDecoration(
                   filled: true,
-                  fillColor: isDark
-                      ? const Color(0xFF1E222B)
-                      : Colors.grey.shade100,
+                  fillColor: context.fieldColor,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
@@ -182,7 +180,7 @@ class _StationPickerSheetState extends State<StationPickerSheet>
                 controller: _tabController,
                 indicatorColor: primary,
                 labelColor: primary,
-                unselectedLabelColor: Colors.grey,
+                unselectedLabelColor: context.mutedColor,
                 isScrollable: true,
                 tabAlignment: TabAlignment.start,
                 labelStyle: const TextStyle(fontWeight: FontWeight.bold),
@@ -191,7 +189,10 @@ class _StationPickerSheetState extends State<StationPickerSheet>
                     Tab(
                       child: Row(
                         children: [
-                          CircleAvatar(radius: 4, backgroundColor: line.color),
+                          CircleAvatar(
+                            radius: 4,
+                            backgroundColor: context.lineColor(line),
+                          ),
                           const SizedBox(width: 6),
                           Text(line.labelKey.tr),
                         ],

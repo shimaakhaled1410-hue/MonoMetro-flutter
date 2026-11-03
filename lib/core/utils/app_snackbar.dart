@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:metro/core/theme/app_palette.dart';
 
 enum SnackbarType { success, error, warning, info }
 
@@ -14,45 +15,34 @@ class AppSnackbar {
     Get.closeCurrentSnackbar();
 
     final isDark = Get.isDarkMode;
+    final palette = AppPalette.of(isDark);
 
     late final Color accentColor;
     late final IconData iconData;
 
     switch (type) {
       case SnackbarType.success:
-        accentColor = isDark
-            ? const Color(0xFF66BB6A)
-            : const Color(0xFF2E7D32);
+        accentColor = palette.success;
         iconData = Icons.check_circle_rounded;
         break;
       case SnackbarType.error:
-        accentColor = isDark
-            ? const Color(0xFFEF5350)
-            : const Color(0xFFD32F2F);
+        accentColor = palette.danger;
         iconData = Icons.error_rounded;
         break;
       case SnackbarType.warning:
-        accentColor = isDark
-            ? const Color(0xFFFFA726)
-            : const Color(0xFFED6C02);
+        accentColor = palette.warning;
         iconData = Icons.warning_rounded;
         break;
       case SnackbarType.info:
-        accentColor = isDark
-            ? const Color(0xFF42A5F5)
-            : const Color(0xFF0288D1);
+        accentColor = palette.info;
         iconData = Icons.info_rounded;
         break;
     }
 
-    final backgroundColor = isDark ? const Color(0xFF1E222A) : Colors.white;
-    final primaryTextColor = isDark ? Colors.white : const Color(0xFF1A1D23);
-    final secondaryTextColor = isDark
-        ? Colors.white.withValues(alpha: 0.70)
-        : const Color(0xFF1A1D23).withValues(alpha: 0.65);
-    final borderColor = isDark
-        ? Colors.white.withValues(alpha: 0.08)
-        : Colors.black.withValues(alpha: 0.06);
+    final backgroundColor = palette.surface;
+    final primaryTextColor = palette.text;
+    final secondaryTextColor = palette.text.withValues(alpha: 0.70);
+    final borderColor = palette.border;
 
     Get.snackbar(
       '',
@@ -72,7 +62,7 @@ class AppSnackbar {
       borderColor: borderColor,
       boxShadows: [
         BoxShadow(
-          color: Colors.black.withValues(alpha: isDark ? 0.40 : 0.10),
+          color: palette.shadow.withValues(alpha: isDark ? 0.40 : 0.10),
           blurRadius: 24,
           offset: const Offset(0, 8),
         ),
@@ -148,7 +138,7 @@ class AppSnackbar {
     required VoidCallback onUndo,
     Duration duration = const Duration(seconds: 4),
   }) {
-    final isDark = Get.isDarkMode;
+    final warningColor = AppPalette.of(Get.isDarkMode).warning;
 
     show(
       title: title,
@@ -157,12 +147,8 @@ class AppSnackbar {
       duration: duration,
       mainButton: TextButton(
         style: TextButton.styleFrom(
-          foregroundColor: isDark
-              ? const Color(0xFFFFB74D)
-              : const Color(0xFFED6C02),
-          backgroundColor:
-              (isDark ? const Color(0xFFFFB74D) : const Color(0xFFED6C02))
-                  .withValues(alpha: 0.12),
+          foregroundColor: warningColor,
+          backgroundColor: warningColor.withValues(alpha: 0.12),
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
           minimumSize: Size.zero,
           tapTargetSize: MaterialTapTargetSize.shrinkWrap,

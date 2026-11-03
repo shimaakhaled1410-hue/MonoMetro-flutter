@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:metro/core/constants/app_colors.dart';
 import 'package:metro/core/utils/fare_formatter.dart';
 import 'package:metro/core/utils/format_time.dart';
 import 'package:metro/core/utils/theme_extensions.dart';
-import 'package:metro/models/passenger_type.dart';
 import 'package:metro/models/trip_history.dart';
 import 'package:metro/services/station_repository.dart';
 
@@ -22,17 +20,6 @@ class TripHistoryCard extends StatelessWidget {
     return StationRepository.byName(name)?.localizedName ?? name;
   }
 
-  Color _badgeColor(PassengerType type) {
-    switch (type) {
-      case PassengerType.senior:
-        return Colors.orange;
-      case PassengerType.specialNeeds:
-        return Colors.teal;
-      case PassengerType.normal:
-        return Colors.blue;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDark;
@@ -41,7 +28,8 @@ class TripHistoryCard extends StatelessWidget {
     final end = (tag != null && tag.isNotEmpty)
         ? '$tag (${_stationName(item.endStation)})'
         : _stationName(item.endStation);
-    final badgeColor = _badgeColor(item.passengerType);
+    final palette = context.palette;
+    final badgeColor = palette.passengerColor(item.passengerType);
     final routeNames = item.routeStations.map(_stationName).toList();
 
     return Card(
@@ -53,7 +41,7 @@ class TripHistoryCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                const Icon(Icons.route, color: Color(0xFF1976D2)),
+                Icon(Icons.route, color: palette.brand),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text.rich(
@@ -102,7 +90,7 @@ class TripHistoryCard extends StatelessWidget {
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.delete_outline, color: Colors.red),
+                  icon: Icon(Icons.delete_outline, color: palette.danger),
                   onPressed: onDelete,
                 ),
               ],
@@ -122,12 +110,12 @@ class TripHistoryCard extends StatelessWidget {
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 itemCount: routeNames.length,
-                separatorBuilder: (_, _) => const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 4),
+                separatorBuilder: (_, _) => Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
                   child: Icon(
                     Icons.arrow_forward,
                     size: 14,
-                    color: Colors.grey,
+                    color: palette.muted,
                     // matchTextDirection: true,
                   ),
                 ),
@@ -139,9 +127,7 @@ class TripHistoryCard extends StatelessWidget {
                       routeNames[index],
                       style: const TextStyle(fontSize: 12),
                     ),
-                    backgroundColor: isDark
-                        ? AppColors.fieldDark
-                        : Colors.grey.shade100,
+                    backgroundColor: palette.field,
                     side: BorderSide.none,
                   ),
                 ),

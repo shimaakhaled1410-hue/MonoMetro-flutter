@@ -19,7 +19,6 @@ class LandmarksDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDark;
     final primary = context.brand;
 
     return Dialog(
@@ -32,7 +31,7 @@ class LandmarksDialog extends StatelessWidget {
           borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.25),
+              color: context.palette.shadow.withValues(alpha: 0.25),
               blurRadius: 20,
               offset: const Offset(0, 8),
             ),
@@ -103,13 +102,9 @@ class LandmarksDialog extends StatelessWidget {
                           vertical: 8,
                         ),
                         decoration: BoxDecoration(
-                          color: isDark
-                              ? const Color(0xFF262C3A)
-                              : const Color(0xFFF6F8FC),
+                          color: context.fieldColor,
                           borderRadius: BorderRadius.circular(14),
-                          border: Border.all(
-                            color: isDark ? Colors.white10 : Colors.grey.shade200,
-                          ),
+                          border: Border.all(color: context.borderColor),
                         ),
                         child: Center(
                           child: Text(

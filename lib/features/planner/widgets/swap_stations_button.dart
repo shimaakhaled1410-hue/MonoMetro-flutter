@@ -27,7 +27,9 @@ class SwapStationsButton extends StatelessWidget {
                 border: Border.all(color: context.borderColor, width: 1.5),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.05),
+                    color: context.palette.shadow.withValues(
+                      alpha: isDark ? 0.25 : 0.05,
+                    ),
                     blurRadius: 6,
                   ),
                 ],

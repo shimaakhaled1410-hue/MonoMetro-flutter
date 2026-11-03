@@ -20,9 +20,9 @@ class PassengerBadgeCard extends StatelessWidget {
             const SizedBox(width: 8),
             Text(
               'passenger_type'.tr,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
-                color: Colors.grey,
+                color: context.mutedColor,
                 fontWeight: FontWeight.bold,
               ),
             ),

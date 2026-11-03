@@ -1,9 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:metro/core/constants/app_colors.dart';
+import 'package:metro/core/theme/app_palette.dart';
 import 'package:metro/models/station.dart';
 import 'package:metro/models/transit_line.dart';
 import 'package:metro/models/transit_mode.dart';
 import 'package:metro/models/trip_result.dart';
+
+/// What connects a timeline stop to its neighbour: a transit line or a walk.
+/// Colors are resolved from the palette at paint time so they follow the theme.
+class TimelineLink {
+  const TimelineLink.walk() : line = null;
+  const TimelineLink.transit(TransitLine this.line);
+
+  final TransitLine? line;
+
+  bool get isWalk => line == null;
+
+  Color colorOf(AppPalette palette) {
+    final line = this.line;
+    return line == null ? palette.walk : palette.lineColor(line);
+  }
+}
 
 class TimelineEntry {
   TimelineEntry(this.station);
@@ -16,8 +32,8 @@ class TimelineEntry {
   TransitLine? travelLine;
   String? walkNoteKey;
   int walkMinutes = 0;
-  Color incomingColor = AppColors.timeline;
-  Color outgoingColor = AppColors.timeline;
+  TimelineLink? incoming;
+  TimelineLink? outgoing;
 
   bool get isInterchange => transferTo != null;
 
@@ -37,12 +53,12 @@ class TimelineEntry {
 
         if (segment.isWalk) {
           if (j == 0) {
-            entry.outgoingColor = AppColors.walk;
+            entry.outgoing = const TimelineLink.walk();
             entry.transferTo = segment.to.primaryLine;
             entry.walkMinutes = segment.walkMinutes;
             entry.walkNoteKey = _walkNoteKey(segment.from);
           } else {
-            entry.incomingColor = AppColors.walk;
+            entry.incoming = const TimelineLink.walk();
           }
           continue;
         }
@@ -55,8 +71,8 @@ class TimelineEntry {
             entry.transferTo = line;
           }
         }
-        if (j > 0) entry.incomingColor = line.color;
-        if (j < lastIndex) entry.outgoingColor = line.color;
+        if (j > 0) entry.incoming = TimelineLink.transit(line);
+        if (j < lastIndex) entry.outgoing = TimelineLink.transit(line);
       }
     }
 

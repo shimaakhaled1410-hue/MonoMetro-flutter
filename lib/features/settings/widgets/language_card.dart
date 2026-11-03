@@ -18,7 +18,7 @@ class LanguageCard extends StatelessWidget {
         title: Text(label),
         trailing: Icon(
           selected ? Icons.radio_button_checked : Icons.radio_button_unchecked,
-          color: selected ? context.brand : Colors.grey,
+          color: selected ? context.brand : context.mutedColor,
         ),
         onTap: () => controller.changeLanguage(code),
       );

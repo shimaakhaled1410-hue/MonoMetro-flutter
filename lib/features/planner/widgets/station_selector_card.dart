@@ -40,9 +40,9 @@ class StationSelectorCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     titleKey.tr,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 13,
-                      color: Colors.grey,
+                      color: context.mutedColor,
                       fontWeight: FontWeight.bold,
                     ),
                   ),

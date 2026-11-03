@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:metro/core/constants/app_colors.dart';
 import 'package:metro/core/utils/theme_extensions.dart';
 import 'package:metro/features/planner/widgets/timeline/timeline_entry.dart';
+import 'package:metro/features/planner/widgets/timeline/timeline_segment_line.dart';
 
 class TimelineStationRow extends StatelessWidget {
   const TimelineStationRow({super.key, required this.entry});
@@ -11,9 +11,18 @@ class TimelineStationRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDark;
+    final palette = context.palette;
     final isEdge = entry.isFirst || entry.isLast;
     final isInterchange = entry.isInterchange;
+    final nodeColor = isInterchange
+        ? palette.interchange
+        : entry.isFirst
+            ? palette.startMarker
+            : entry.isLast
+                ? palette.endMarker
+                : palette.timeline;
+    final nodeFill = (isInterchange || isEdge) ? nodeColor : context.surfaceColor;
+    final nodeRing = isInterchange ? palette.interchangeRing : nodeColor;
 
     return IntrinsicHeight(
       child: Row(
@@ -28,18 +37,22 @@ class TimelineStationRow extends StatelessWidget {
                   Positioned(
                     top: 14,
                     bottom: 0,
-                    child: Container(
-                      width: 3,
-                      color: entry.outgoingColor.withValues(alpha: 0.7),
+                    child: TimelineSegmentLine(
+                      color: (entry.outgoing?.colorOf(palette) ??
+                              palette.timeline)
+                          .withValues(alpha: 0.7),
+                      dotted: entry.outgoing?.isWalk ?? false,
                     ),
                   ),
                 if (!entry.isFirst)
                   Positioned(
                     top: 0,
                     bottom: 14,
-                    child: Container(
-                      width: 3,
-                      color: entry.incomingColor.withValues(alpha: 0.7),
+                    child: TimelineSegmentLine(
+                      color: (entry.incoming?.colorOf(palette) ??
+                              palette.timeline)
+                          .withValues(alpha: 0.7),
+                      dotted: entry.incoming?.isWalk ?? false,
                     ),
                   ),
                 Container(
@@ -47,18 +60,18 @@ class TimelineStationRow extends StatelessWidget {
                   height: isInterchange ? 18 : 14,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: isInterchange
-                        ? Colors.amber.shade700
-                        : (isEdge ? AppColors.timeline : context.surfaceColor),
+                    color: nodeFill,
                     border: Border.all(
-                      color: isInterchange
-                          ? Colors.amber.shade300
-                          : AppColors.timeline,
+                      color: nodeRing,
                       width: isInterchange ? 2 : 3,
                     ),
                   ),
                   child: isInterchange
-                      ? const Icon(Icons.sync_alt, size: 10, color: Colors.white)
+                      ? Icon(
+                          Icons.sync_alt,
+                          size: 10,
+                          color: palette.onInterchange,
+                        )
                       : null,
                 ),
               ],
@@ -77,7 +90,7 @@ class TimelineStationRow extends StatelessWidget {
                         child: Text(
                           entry.station.localizedName,
                           style: TextStyle(
-                            color: isDark ? Colors.white : Colors.black87,
+                            color: context.onSurfaceStrong,
                             fontSize: 15,
                             fontWeight: (isEdge || isInterchange)
                                 ? FontWeight.bold
@@ -103,9 +116,9 @@ class TimelineStationRow extends StatelessWidget {
                       entry.walkNoteKey!.trParams({
                         'minutes': entry.walkMinutes.toString(),
                       }),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
-                        color: AppColors.walk,
+                        color: palette.walk,
                       ),
                     ),
                   ],
@@ -140,7 +153,7 @@ class _EdgeBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
       decoration: BoxDecoration(
-        color: context.isDark ? AppColors.borderDark : Colors.grey.shade200,
+        color: context.fieldColor,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
@@ -161,19 +174,23 @@ class _TransferBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: AppColors.timeline,
+        color: context.brand,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.transfer_within_a_station, color: Colors.white, size: 13),
+          Icon(
+            Icons.transfer_within_a_station,
+            color: context.palette.onBrand,
+            size: 13,
+          ),
           const SizedBox(width: 4),
           Flexible(
             child: Text(
               label,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: context.palette.onBrand,
                 fontSize: 11,
                 fontWeight: FontWeight.bold,
               ),

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:metro/core/constants/app_colors.dart';
 import 'package:metro/core/utils/fare_formatter.dart';
 import 'package:metro/core/utils/format_time.dart';
 import 'package:metro/core/utils/theme_extensions.dart';
@@ -32,12 +31,10 @@ class RouteOptionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final details = _details();
-    final isDark = context.isDark;
+    final palette = context.palette;
     final primary = context.brand;
 
-    final background = isSelected
-        ? (isDark ? AppColors.selectedRouteDark : AppColors.selectedRouteLight)
-        : context.surfaceColor;
+    final background = isSelected ? palette.selectedRoute : context.surfaceColor;
 
     return Semantics(
       button: true,
@@ -63,7 +60,7 @@ class RouteOptionCard extends StatelessWidget {
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 13,
-                  color: isSelected ? Colors.white : primary,
+                  color: isSelected ? palette.onSelectedRoute : primary,
                 ),
               ),
               const SizedBox(height: 8),
@@ -71,7 +68,9 @@ class RouteOptionCard extends StatelessWidget {
                 '${trip.stationCount} ${'stations'.tr} • ${formatTripDuration(trip.estimatedTimeMinutes)}',
                 style: TextStyle(
                   fontSize: 12,
-                  color: isSelected ? Colors.white70 : context.mutedColor,
+                  color: isSelected
+                      ? palette.onSelectedRouteMuted
+                      : context.mutedColor,
                 ),
               ),
               if (details != null) ...[
@@ -81,7 +80,9 @@ class RouteOptionCard extends StatelessWidget {
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 12,
-                    color: isSelected ? Colors.white : context.onSurfaceStrong,
+                    color: isSelected
+                        ? palette.onSelectedRoute
+                        : context.onSurfaceStrong,
                   ),
                 ),
               ],

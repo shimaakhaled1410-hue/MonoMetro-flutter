@@ -7,8 +7,13 @@ import 'package:metro/features/history/widgets/trip_history_card.dart';
 class HistoryView extends StatelessWidget {
   const HistoryView({super.key});
 
-  Future<void> _confirmClear(HistoryController controller) async {
+  Future<void> _confirmClear(
+    BuildContext context,
+    HistoryController controller,
+  ) async {
     if (controller.historyList.isEmpty) return;
+
+    final dangerColor = context.palette.danger;
 
     final confirmed = await Get.dialog<bool>(
       AlertDialog(
@@ -23,7 +28,7 @@ class HistoryView extends StatelessWidget {
             onPressed: () => Get.back(result: true),
             child: Text(
               'delete'.tr,
-              style: const TextStyle(color: Colors.red),
+              style: TextStyle(color: dangerColor),
             ),
           ),
         ],
@@ -44,7 +49,7 @@ class HistoryView extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.delete_sweep),
             tooltip: 'clear_history'.tr,
-            onPressed: () => _confirmClear(controller),
+            onPressed: () => _confirmClear(context, controller),
           ),
         ],
       ),

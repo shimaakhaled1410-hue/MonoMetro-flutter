@@ -21,7 +21,7 @@ class PassengerCategoryTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = context.isDark;
     final primary = context.brand;
-    final onPrimary = isDark ? Colors.black87 : Colors.white;
+    final onPrimary = context.palette.onBrand;
 
     return Semantics(
       button: true,

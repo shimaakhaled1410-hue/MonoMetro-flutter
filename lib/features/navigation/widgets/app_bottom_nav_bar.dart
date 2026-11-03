@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:metro/core/constants/app_colors.dart';
 import 'package:metro/core/utils/theme_extensions.dart';
 
 class _NavDestination {
@@ -58,15 +57,13 @@ class AppBottomNavBar extends StatelessWidget {
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.06),
+            color: context.palette.shadow.withValues(alpha: isDark ? 0.4 : 0.06),
             blurRadius: 14,
             offset: const Offset(0, -4),
           ),
         ],
         border: Border(
-          top: BorderSide(
-            color: isDark ? AppColors.borderDark : Colors.grey.shade200,
-          ),
+          top: BorderSide(color: context.borderColor),
         ),
       ),
       child: SafeArea(

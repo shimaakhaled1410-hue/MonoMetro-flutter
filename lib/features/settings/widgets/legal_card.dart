@@ -62,10 +62,10 @@ class LegalCard extends StatelessWidget {
     return ListTile(
       leading: Icon(icon),
       title: Text(titleKey.tr),
-      trailing: const Icon(
+      trailing: Icon(
         Icons.arrow_forward_ios,
         size: 16,
-        color: Colors.grey,
+        color: context.mutedColor,
         // matchTextDirection: true,
       ),
       onTap: () => _showLegalDialog(

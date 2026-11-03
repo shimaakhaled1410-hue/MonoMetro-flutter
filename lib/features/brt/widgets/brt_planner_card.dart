@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:metro/core/constants/app_colors.dart';
+import 'package:metro/core/utils/theme_extensions.dart';
 import 'package:metro/features/planner/controllers/metro_controller.dart';
 import 'package:metro/features/planner/widgets/calculate_trip_button.dart';
 import 'package:metro/features/planner/widgets/station_picker_sheet.dart';
@@ -52,7 +52,7 @@ class BrtPlannerCard extends StatelessWidget {
             _tile(
               context,
               icon: Icons.trip_origin,
-              color: AppColors.startMarker,
+              color: context.palette.startMarker,
               stationOf: () => controller.startStation.value,
               placeholderKey: 'tap_select_start',
               isStart: true,
@@ -61,7 +61,7 @@ class BrtPlannerCard extends StatelessWidget {
             _tile(
               context,
               icon: Icons.location_on,
-              color: AppColors.endMarker,
+              color: context.palette.endMarker,
               stationOf: () => controller.endStation.value,
               placeholderKey: 'tap_select_end',
               isStart: false,

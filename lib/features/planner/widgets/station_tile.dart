@@ -35,7 +35,7 @@ class StationTile extends StatelessWidget {
               width: 10,
               height: 10,
               decoration: BoxDecoration(
-                color: station.primaryLine.color,
+                color: context.lineColor(station.primaryLine),
                 shape: BoxShape.circle,
               ),
             ),
@@ -66,9 +66,7 @@ class StationTile extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: isDark
-                      ? Colors.amber.shade900.withValues(alpha: 0.3)
-                      : Colors.amber.shade100,
+                  color: context.brand.withValues(alpha: isDark ? 0.2 : 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
@@ -76,7 +74,7 @@ class StationTile extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.amber.shade200 : Colors.amber.shade900,
+                    color: context.brand,
                   ),
                 ),
               ),

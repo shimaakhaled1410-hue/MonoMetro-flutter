@@ -108,8 +108,8 @@ class _SplashViewState extends State<SplashView>
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: isDark
-                ? const [Color(0xFF121212), Color(0xFF1A1A1A)]
-                : const [Colors.white, Color(0xFFF5F6F8)],
+                ? [context.palette.scaffold, context.surfaceColor]
+                : [context.surfaceColor, context.palette.scaffold],
           ),
         ),
         child: Center(
@@ -125,7 +125,7 @@ class _SplashViewState extends State<SplashView>
                       borderRadius: BorderRadius.circular(28),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black
+                          color: context.palette.shadow
                               .withValues(alpha: isDark ? 0.4 : 0.12),
                           blurRadius: 24,
                           offset: const Offset(0, 10),

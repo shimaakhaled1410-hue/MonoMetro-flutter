@@ -1,13 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:metro/core/utils/theme_extensions.dart';
 import 'package:metro/models/transit_mode.dart';
-
-class _ModeStyle {
-  const _ModeStyle(this.icon, this.color);
-
-  final IconData icon;
-  final Color color;
-}
 
 class TransitTypeSheet extends StatelessWidget {
   const TransitTypeSheet({
@@ -19,13 +13,10 @@ class TransitTypeSheet extends StatelessWidget {
   final List<TransitMode> modes;
   final ValueChanged<TransitMode> onSelected;
 
-  static const Map<TransitMode, _ModeStyle> _styles = {
-    TransitMode.metro: _ModeStyle(Icons.subway_rounded, Color(0xFF1F5F5B)),
-    TransitMode.monorail: _ModeStyle(Icons.train_rounded, Color(0xFFFD5E5C)),
-    TransitMode.brt: _ModeStyle(
-      Icons.directions_bus_rounded,
-      Color(0xFFF39C12),
-    ),
+  static const Map<TransitMode, IconData> _icons = {
+    TransitMode.metro: Icons.subway_rounded,
+    TransitMode.monorail: Icons.train_rounded,
+    TransitMode.brt: Icons.directions_bus_rounded,
   };
 
   static Future<void> show(
@@ -70,20 +61,20 @@ class TransitTypeSheet extends StatelessWidget {
               Text(
                 'choose_transit_type_desc'.tr,
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+                style: TextStyle(fontSize: 13, color: context.mutedColor),
               ),
               const SizedBox(height: 20),
               for (final mode in modes) ...[
                 ListTile(
                   leading: Icon(
-                    _styles[mode]!.icon,
-                    color: _styles[mode]!.color,
+                    _icons[mode]!,
+                    color: context.palette.modeColor(mode),
                   ),
                   title: Text(mode.labelKey.tr),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  tileColor: Colors.grey.withValues(alpha: 0.08),
+                  tileColor: context.fieldColor,
                   onTap: () => onSelected(mode),
                 ),
                 const SizedBox(height: 10),

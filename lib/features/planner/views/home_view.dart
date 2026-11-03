@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:metro/core/constants/app_colors.dart';
 import 'package:metro/core/utils/theme_extensions.dart';
 import 'package:metro/core/widgets/outlined_action_button.dart';
 import 'package:metro/features/planner/controllers/metro_controller.dart';
@@ -60,7 +59,7 @@ class HomeView extends StatelessWidget {
             const SizedBox(height: 12),
             StationSelectorCard(
               icon: Icons.trip_origin,
-              iconColor: AppColors.startMarker,
+              iconColor: context.palette.startMarker,
               titleKey: 'starting_point',
               placeholderKey: 'tap_select_start',
               stationOf: () => controller.startStation.value,
@@ -99,7 +98,7 @@ class HomeView extends StatelessWidget {
             SwapStationsButton(onTap: controller.swapStations),
             StationSelectorCard(
               icon: Icons.location_on,
-              iconColor: AppColors.endMarker,
+              iconColor: context.palette.endMarker,
               titleKey: 'destination',
               placeholderKey: 'tap_select_end',
               stationOf: () => controller.endStation.value,
