@@ -2,12 +2,12 @@ class AreasData {
   const AreasData._();
 
   static const Map<String, String> directory = {
-    'السلام': 'El Salam',
-    'مدينة السلام': 'El Salam',
-    'salam': 'El Salam',
-    'العاشر': 'Al Asher Station',
-    'موقف العاشر': 'Al Asher Station',
-    'asher': 'Al Asher Station',
+    'السلام': 'Adly Mansour',
+    'مدينة السلام': 'Adly Mansour',
+    'salam': 'Adly Mansour',
+    'العاشر': 'Adly Mansour',
+    'موقف العاشر': 'Adly Mansour',
+    'asher': 'Adly Mansour',
     'الشروق': 'Adly Mansour',
     'بدر': 'Adly Mansour',
     'shorouk': 'Adly Mansour',

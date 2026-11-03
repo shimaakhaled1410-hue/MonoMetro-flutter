@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:metro/core/utils/theme_extensions.dart';
 import 'package:metro/features/navigation/main_navigation_view.dart';
 import 'package:metro/features/onboarding/widgets/passenger_category_tile.dart';
-import 'package:metro/features/planner/controllers/metro_controller.dart';
+import 'package:metro/features/planner/controllers/passenger_controller.dart';
 import 'package:metro/models/passenger_type.dart';
 import 'package:metro/services/settings_service.dart';
 
@@ -57,7 +57,7 @@ class WelcomeView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.find<MetroController>();
+    final controller = Get.find<PassengerController>();
     final primary = context.brand;
 
     return Scaffold(
@@ -106,7 +106,7 @@ class WelcomeView extends StatelessWidget {
               const SizedBox(height: 32),
               Expanded(
                 child: Obx(() {
-                  final selectedType = controller.passengerType.value;
+                  final selectedType = controller.type.value;
                   return ListView.separated(
                     itemCount: _categories.length,
                     separatorBuilder: (_, _) => const SizedBox(height: 12),
@@ -117,7 +117,7 @@ class WelcomeView extends StatelessWidget {
                         subtitle: category.descriptionKey.tr,
                         icon: category.icon,
                         isSelected: selectedType == category.type,
-                        onTap: () => controller.setPassengerType(category.type),
+                        onTap: () => controller.setType(category.type),
                       );
                     },
                   );
@@ -127,9 +127,7 @@ class WelcomeView extends StatelessWidget {
               FilledButton(
                 style: FilledButton.styleFrom(
                   backgroundColor: primary,
-                  foregroundColor: context.isDark
-                      ? Colors.black87
-                      : Colors.white,
+                  foregroundColor: context.isDark ? Colors.black87 : Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),

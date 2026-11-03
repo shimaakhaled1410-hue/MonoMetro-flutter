@@ -2,6 +2,7 @@ import 'package:metro/data/lines_data.dart';
 import 'package:metro/data/stations_data.dart';
 import 'package:metro/models/station.dart';
 import 'package:metro/models/transit_line.dart';
+import 'package:metro/models/transit_network.dart';
 
 class StationRepository {
   const StationRepository._();
@@ -14,11 +15,12 @@ class StationRepository {
 
   static Station? byName(String name) => _byName[name];
 
+  static List<Station> forNetwork(TransitNetwork network) {
+    return all.where((station) => station.network == network).toList();
+  }
+
   static List<Station> forLine(TransitLine line) {
-    return LinesData.namesFor(line)
-        .map(byName)
-        .whereType<Station>()
-        .toList();
+    return LinesData.namesFor(line).map(byName).whereType<Station>().toList();
   }
 
   static List<Station> _build() {

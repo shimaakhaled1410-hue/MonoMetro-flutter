@@ -10,24 +10,34 @@ class _ModeStyle {
 }
 
 class TransitTypeSheet extends StatelessWidget {
-  const TransitTypeSheet({super.key, required this.onSelected});
+  const TransitTypeSheet({
+    super.key,
+    required this.modes,
+    required this.onSelected,
+  });
 
+  final List<TransitMode> modes;
   final ValueChanged<TransitMode> onSelected;
 
   static const Map<TransitMode, _ModeStyle> _styles = {
     TransitMode.metro: _ModeStyle(Icons.subway_rounded, Color(0xFF1F5F5B)),
     TransitMode.monorail: _ModeStyle(Icons.train_rounded, Color(0xFFFD5E5C)),
-    TransitMode.brt: _ModeStyle(Icons.directions_bus_rounded, Color(0xFFF39C12)),
+    TransitMode.brt: _ModeStyle(
+      Icons.directions_bus_rounded,
+      Color(0xFFF39C12),
+    ),
   };
 
   static Future<void> show(
     BuildContext context, {
+    required List<TransitMode> modes,
     required ValueChanged<TransitMode> onSelected,
   }) {
     return showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (sheetContext) => TransitTypeSheet(
+        modes: modes,
         onSelected: (mode) {
           Navigator.pop(sheetContext);
           onSelected(mode);
@@ -53,7 +63,10 @@ class TransitTypeSheet extends StatelessWidget {
               Text(
                 'select_transit_type'.tr,
                 textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 8),
               Text(
@@ -62,9 +75,12 @@ class TransitTypeSheet extends StatelessWidget {
                 style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
               ),
               const SizedBox(height: 20),
-              for (final mode in TransitMode.values) ...[
+              for (final mode in modes) ...[
                 ListTile(
-                  leading: Icon(_styles[mode]!.icon, color: _styles[mode]!.color),
+                  leading: Icon(
+                    _styles[mode]!.icon,
+                    color: _styles[mode]!.color,
+                  ),
                   title: Text(mode.labelKey.tr),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),

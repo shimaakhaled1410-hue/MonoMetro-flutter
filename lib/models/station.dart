@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:metro/models/transit_line.dart';
 import 'package:metro/models/transit_mode.dart';
+import 'package:metro/models/transit_network.dart';
 
 class Station {
   const Station({
@@ -17,8 +18,17 @@ class Station {
   final double longitude;
   final List<TransitLine> lines;
 
+  static final RegExp _networkSuffix = RegExp(r'\s*\([^)]*\)$');
+
   String get localizedName {
-    return Get.locale?.languageCode == 'ar' ? nameAr : name;
+    final value = Get.locale?.languageCode == 'ar' ? nameAr : name;
+    return network == TransitNetwork.brt
+        ? value.replaceAll(_networkSuffix, '')
+        : value;
+  }
+
+  TransitNetwork get network {
+    return lines.isEmpty ? TransitNetwork.rail : lines.first.network;
   }
 
   bool get isInterchange => lines.length > 1;

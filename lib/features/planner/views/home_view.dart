@@ -13,13 +13,15 @@ import 'package:metro/features/planner/widgets/station_selector_card.dart';
 import 'package:metro/features/planner/widgets/swap_stations_button.dart';
 import 'package:metro/features/planner/widgets/transit_type_sheet.dart';
 import 'package:metro/features/planner/widgets/trip_results_section.dart';
+import 'package:metro/models/transit_network.dart';
+import 'package:metro/models/transit_mode.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.find<MetroController>();
+    final controller = MetroController.of(TransitNetwork.rail);
     final primary = context.brand;
 
     return Scaffold(
@@ -33,7 +35,10 @@ class HomeView extends StatelessWidget {
               child: Text(
                 'app_title'.tr,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ],
@@ -51,7 +56,7 @@ class HomeView extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            PassengerBadgeCard(controller: controller),
+            const PassengerBadgeCard(),
             const SizedBox(height: 12),
             StationSelectorCard(
               icon: Icons.trip_origin,
@@ -62,6 +67,7 @@ class HomeView extends StatelessWidget {
               onTap: () => StationPickerSheet.show(
                 context,
                 title: 'select_dep_station'.tr,
+                network: TransitNetwork.rail,
                 onSelected: controller.selectStartStation,
               ),
               headerAction: IconButton(
@@ -85,6 +91,7 @@ class HomeView extends StatelessWidget {
                 ),
                 onPressed: () => TransitTypeSheet.show(
                   context,
+                  modes: const [TransitMode.metro, TransitMode.monorail],
                   onSelected: controller.useNearestStation,
                 ),
               ),
@@ -99,6 +106,7 @@ class HomeView extends StatelessWidget {
               onTap: () => StationPickerSheet.show(
                 context,
                 title: 'select_dest_station'.tr,
+                network: TransitNetwork.rail,
                 onSelected: controller.selectEndStation,
               ),
               bottomAction: OutlinedActionButton(
@@ -116,7 +124,7 @@ class HomeView extends StatelessWidget {
             const SizedBox(height: 16),
             CalculateTripButton(onPressed: controller.calculateTrip),
             const SizedBox(height: 16),
-            const TripResultsSection(),
+            TripResultsSection(controller: controller),
           ],
         ),
       ),

@@ -6,11 +6,12 @@ import 'package:metro/features/planner/widgets/route_option_card.dart';
 import 'package:metro/features/planner/widgets/timeline/vertical_timeline.dart';
 
 class TripResultsSection extends StatelessWidget {
-  const TripResultsSection({super.key});
+  const TripResultsSection({super.key, required this.controller});
+
+  final MetroController controller;
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.find<MetroController>();
     final primary = context.brand;
 
     return Obx(() {

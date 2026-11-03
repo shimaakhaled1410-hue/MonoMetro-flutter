@@ -1,34 +1,39 @@
 import 'package:get/get.dart';
 import 'package:metro/core/utils/app_snackbar.dart';
 import 'package:metro/features/history/controllers/history_controller.dart';
-import 'package:metro/models/passenger_type.dart';
+import 'package:metro/features/planner/controllers/passenger_controller.dart';
 import 'package:metro/models/routing_preference.dart';
 import 'package:metro/models/station.dart';
 import 'package:metro/models/transit_mode.dart';
+import 'package:metro/models/transit_network.dart';
 import 'package:metro/models/trip_result.dart';
 import 'package:metro/services/location_service.dart';
 import 'package:metro/services/map_launcher_service.dart';
 import 'package:metro/services/metro_graph_service.dart';
 import 'package:metro/services/nearest_station_service.dart';
-import 'package:metro/services/settings_service.dart';
 
 class MetroController extends GetxController {
   MetroController({
+    required this.network,
     required MetroGraphService graphService,
-    required SettingsService settings,
-    required HistoryController history,
-  })  : _graph = graphService,
-        _settings = settings,
-        _history = history;
+    required PassengerController passengerController,
+    required HistoryController historyController,
+  }) : _graph = graphService,
+       _passenger = passengerController,
+       _history = historyController;
 
+  static MetroController of(TransitNetwork network) {
+    return Get.find<MetroController>(tag: network.name);
+  }
+
+  final TransitNetwork network;
   final MetroGraphService _graph;
-  final SettingsService _settings;
+  final PassengerController _passenger;
   final HistoryController _history;
 
   final Rxn<Station> startStation = Rxn<Station>();
   final Rxn<Station> endStation = Rxn<Station>();
   final RxnString destinationTag = RxnString();
-  final Rx<PassengerType> passengerType = PassengerType.normal.obs;
 
   final Rxn<TripResult> fastestTrip = Rxn<TripResult>();
   final Rxn<TripResult> comfortableTrip = Rxn<TripResult>();
@@ -38,7 +43,7 @@ class MetroController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    passengerType.value = _settings.passengerType;
+    ever(_passenger.type, (_) => _refreshTrips());
   }
 
   TripResult? get activeTrip {
@@ -83,10 +88,7 @@ class MetroController extends GetxController {
     }
   }
 
-  void setPassengerType(PassengerType type) {
-    passengerType.value = type;
-    _settings.setPassengerType(type);
-
+  void _refreshTrips() {
     final start = startStation.value;
     final end = endStation.value;
     if (fastestTrip.value != null && start != null && end != null) {
@@ -129,10 +131,7 @@ class MetroController extends GetxController {
     _computeTrips(start, end);
 
     if (fastestTrip.value == null) {
-      AppSnackbar.error(
-        title: 'metro_title'.tr,
-        message: 'no_route_found'.tr,
-      );
+      AppSnackbar.error(title: 'metro_title'.tr, message: 'no_route_found'.tr);
     }
   }
 
@@ -146,7 +145,7 @@ class MetroController extends GetxController {
       trip: trip,
       start: start,
       end: end,
-      passengerType: passengerType.value,
+      passengerType: _passenger.type.value,
       destinationTag: destinationTag.value,
     );
   }
@@ -154,10 +153,7 @@ class MetroController extends GetxController {
   Future<void> openStationOnMap(Station station) async {
     final opened = await MapLauncherService.openStation(station);
     if (!opened) {
-      AppSnackbar.error(
-        title: 'metro_title'.tr,
-        message: 'map_open_failed'.tr,
-      );
+      AppSnackbar.error(title: 'metro_title'.tr, message: 'map_open_failed'.tr);
     }
   }
 
@@ -200,17 +196,17 @@ class MetroController extends GetxController {
   (String, String) _locationMessage(LocationFailure? failure) {
     return switch (failure) {
       LocationFailure.serviceDisabled => (
-          'location_notice_title',
-          'location_notice_desc',
-        ),
+        'location_notice_title',
+        'location_notice_desc',
+      ),
       LocationFailure.permissionDenied => (
-          'location_permission_title',
-          'location_permission_denied',
-        ),
+        'location_permission_title',
+        'location_permission_denied',
+      ),
       LocationFailure.permissionDeniedForever => (
-          'location_permission_title',
-          'location_permission_denied_forever',
-        ),
+        'location_permission_title',
+        'location_permission_denied_forever',
+      ),
       _ => ('location_error_title', 'location_error_desc'),
     };
   }
@@ -220,13 +216,13 @@ class MetroController extends GetxController {
     fastestTrip.value = _graph.calculateTrip(
       start.name,
       end.name,
-      passengerType.value,
+      _passenger.type.value,
       preference: RoutingPreference.fastest,
     );
     comfortableTrip.value = _graph.calculateTrip(
       start.name,
       end.name,
-      passengerType.value,
+      _passenger.type.value,
       preference: RoutingPreference.comfortable,
     );
   }

@@ -5,7 +5,7 @@ import 'package:metro/features/planner/controllers/metro_controller.dart';
 import 'package:metro/features/planner/widgets/calculate_trip_button.dart';
 import 'package:metro/features/planner/widgets/station_picker_sheet.dart';
 import 'package:metro/models/station.dart';
-import 'package:metro/models/transit_line.dart';
+import 'package:metro/models/transit_network.dart';
 
 class BrtPlannerCard extends StatelessWidget {
   const BrtPlannerCard({super.key, required this.controller});
@@ -16,7 +16,7 @@ class BrtPlannerCard extends StatelessWidget {
     StationPickerSheet.show(
       context,
       title: isStart ? 'select_dep_station'.tr : 'select_dest_station'.tr,
-      initialLine: TransitLine.brtRing,
+      network: TransitNetwork.brt,
       onSelected: (station) => isStart
           ? controller.selectStartStation(station)
           : controller.selectEndStation(station),

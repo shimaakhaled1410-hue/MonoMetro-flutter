@@ -4,6 +4,7 @@ import 'package:metro/core/utils/theme_extensions.dart';
 import 'package:metro/features/planner/widgets/station_tile.dart';
 import 'package:metro/models/station.dart';
 import 'package:metro/models/transit_line.dart';
+import 'package:metro/models/transit_network.dart';
 import 'package:metro/services/station_repository.dart';
 import 'package:metro/services/station_search_service.dart';
 
@@ -11,19 +12,19 @@ class StationPickerSheet extends StatefulWidget {
   const StationPickerSheet({
     super.key,
     required this.title,
+    required this.network,
     required this.onSelected,
-    this.initialLine,
   });
 
   final String title;
+  final TransitNetwork network;
   final ValueChanged<Station> onSelected;
-  final TransitLine? initialLine;
 
   static Future<void> show(
     BuildContext context, {
     required String title,
+    required TransitNetwork network,
     required ValueChanged<Station> onSelected,
-    TransitLine? initialLine,
   }) {
     return showModalBottomSheet<void>(
       context: context,
@@ -31,7 +32,7 @@ class StationPickerSheet extends StatefulWidget {
       backgroundColor: Colors.transparent,
       builder: (sheetContext) => StationPickerSheet(
         title: title,
-        initialLine: initialLine,
+        network: network,
         onSelected: (station) {
           Navigator.pop(sheetContext);
           onSelected(station);
@@ -47,17 +48,14 @@ class StationPickerSheet extends StatefulWidget {
 class _StationPickerSheetState extends State<StationPickerSheet>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
+  late final List<TransitLine> _lines = widget.network.lines;
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(
-      length: TransitLine.values.length,
-      vsync: this,
-      initialIndex: widget.initialLine?.index ?? 0,
-    );
+    _tabController = TabController(length: _lines.length, vsync: this);
   }
 
   @override
@@ -70,7 +68,10 @@ class _StationPickerSheetState extends State<StationPickerSheet>
   Widget _buildStationList(List<Station> stations, {bool showLines = false}) {
     if (stations.isEmpty) {
       return Center(
-        child: Text('no_results'.tr, style: TextStyle(color: context.mutedColor)),
+        child: Text(
+          'no_results'.tr,
+          style: TextStyle(color: context.mutedColor),
+        ),
       );
     }
     return ListView.separated(
@@ -139,7 +140,9 @@ class _StationPickerSheetState extends State<StationPickerSheet>
                 controller: _searchController,
                 decoration: InputDecoration(
                   filled: true,
-                  fillColor: isDark ? const Color(0xFF1E222B) : Colors.grey.shade100,
+                  fillColor: isDark
+                      ? const Color(0xFF1E222B)
+                      : Colors.grey.shade100,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
@@ -163,8 +166,15 @@ class _StationPickerSheetState extends State<StationPickerSheet>
               const SizedBox(height: 8),
               Expanded(
                 child: _buildStationList(
-                  StationSearchService.search(_searchQuery),
+                  StationSearchService.search(_searchQuery, widget.network),
                   showLines: true,
+                ),
+              ),
+            ] else if (_lines.length == 1) ...[
+              const SizedBox(height: 8),
+              Expanded(
+                child: _buildStationList(
+                  StationRepository.forLine(_lines.first),
                 ),
               ),
             ] else ...[
@@ -177,7 +187,7 @@ class _StationPickerSheetState extends State<StationPickerSheet>
                 tabAlignment: TabAlignment.start,
                 labelStyle: const TextStyle(fontWeight: FontWeight.bold),
                 tabs: [
-                  for (final line in TransitLine.values)
+                  for (final line in _lines)
                     Tab(
                       child: Row(
                         children: [
@@ -194,7 +204,7 @@ class _StationPickerSheetState extends State<StationPickerSheet>
                 child: TabBarView(
                   controller: _tabController,
                   children: [
-                    for (final line in TransitLine.values)
+                    for (final line in _lines)
                       _buildStationList(StationRepository.forLine(line)),
                   ],
                 ),

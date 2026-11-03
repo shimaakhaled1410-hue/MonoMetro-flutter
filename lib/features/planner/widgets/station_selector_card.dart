@@ -47,7 +47,7 @@ class StationSelectorCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                if (headerAction != null) headerAction!,
+                ?headerAction,
               ],
             ),
             const SizedBox(height: 6),
@@ -55,7 +55,10 @@ class StationSelectorCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
               onTap: onTap,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 12,
+                ),
                 decoration: BoxDecoration(
                   color: context.fieldColor,
                   borderRadius: BorderRadius.circular(12),
