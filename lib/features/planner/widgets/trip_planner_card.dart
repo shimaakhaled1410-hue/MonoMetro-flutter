@@ -219,8 +219,6 @@ class _StationRow extends StatelessWidget {
           final station = stationOf();
           return Text(
             station == null ? placeholderKey.tr : station.localizedName,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,

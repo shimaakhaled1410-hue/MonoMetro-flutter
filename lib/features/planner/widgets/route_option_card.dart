@@ -65,8 +65,6 @@ class RouteOptionCard extends StatelessWidget {
                     Expanded(
                       child: Text(
                         title,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 12,
@@ -86,8 +84,8 @@ class RouteOptionCard extends StatelessWidget {
                 Text(
                   formatTripDuration(trip.estimatedTimeMinutes),
                   style: TextStyle(
-                    fontWeight: FontWeight.w700,
-                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 24,
                     height: 1.1,
                     color: mainColor,
                   ),

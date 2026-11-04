@@ -89,8 +89,6 @@ class _LandmarkTile extends StatelessWidget {
                 children: [
                   Text(
                     landmark.localizedTitle,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
@@ -110,8 +108,6 @@ class _LandmarkTile extends StatelessWidget {
                         Flexible(
                           child: Text(
                             stationName,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontSize: 12,
                               color: context.mutedColor,
