@@ -86,8 +86,8 @@ class RouteOptionCard extends StatelessWidget {
                 Text(
                   formatTripDuration(trip.estimatedTimeMinutes),
                   style: TextStyle(
-                    fontWeight: FontWeight.w800,
-                    fontSize: 24,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 18,
                     height: 1.1,
                     color: mainColor,
                   ),
