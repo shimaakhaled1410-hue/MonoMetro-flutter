@@ -39,7 +39,7 @@ const Map<String, String> translationsAr = {
   'senior_desc': 'خصم 50% على جميع أسعار التذاكر',
   'special_desc': 'سعر موحد 5 جنيهات لجميع الخطوط',
   'route_options': 'خيارات المسار',
-  'fastest_route': 'الأسرع',
+  'fastest_route': 'الأسرع (أقل محطات)',
   'fewest_transfers': 'المسار المريح (أقل تحويلات)',
   'transfers_count': 'تبديلات',
   'nav_home': 'الرئيسية',

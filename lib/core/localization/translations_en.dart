@@ -38,7 +38,7 @@ const Map<String, String> translationsEn = {
   'senior_desc': '50% discount on all ticket tiers',
   'special_desc': 'Fixed 5 EGP fare across all lines',
   'route_options': 'Trip Route Options',
-  'fastest_route': 'Fastest Route',
+  'fastest_route': 'Fastest (Fewest Stations)',
   'fewest_transfers': 'Comfort (Fewest Transfers)',
   'transfers_count': 'transfers',
   'nav_home': 'Home',

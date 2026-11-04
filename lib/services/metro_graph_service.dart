@@ -55,8 +55,9 @@ class MetroGraphService {
     _build();
   }
 
-  static const int _comfortTransferPenalty = 12;
-  static const int _costScale = 10;
+  static const int _stopWeight = 5000;
+  static const int _transferWeight = 700;
+  static const int _comfortTransferWeight = 10000000;
 
   final Map<String, List<_RideEdge>> _rideEdges = {};
   final Map<String, List<_WalkEdge>> _walkEdges = {};
@@ -217,11 +218,9 @@ class MetroGraphService {
       return null;
     }
 
-    final transferCost =
-        LinesData.transferMinutes +
-        (preference == RoutingPreference.comfortable
-            ? _comfortTransferPenalty
-            : 0);
+    final transferCost = preference == RoutingPreference.comfortable
+        ? _comfortTransferWeight
+        : _transferWeight;
 
     final distances = <String, int>{};
     final states = <String, _State>{};
@@ -267,7 +266,7 @@ class MetroGraphService {
         if (edge.line != current.line) continue;
         push(
           _State(edge.to, edge.line),
-          currentCost + edge.minutes * _costScale + 1,
+          currentCost + _stopWeight + edge.minutes,
           _Step(currentKey, _StepType.ride),
         );
       }
@@ -277,7 +276,7 @@ class MetroGraphService {
         if (line == current.line) continue;
         push(
           _State(current.station, line),
-          currentCost + transferCost * _costScale + 1,
+          currentCost + transferCost,
           _Step(currentKey, _StepType.switchLine),
         );
       }
@@ -288,7 +287,7 @@ class MetroGraphService {
         for (final line in target.lines) {
           push(
             _State(walk.to, line),
-            currentCost + walk.minutes * _costScale + 1,
+            currentCost + _stopWeight + transferCost + walk.minutes,
             _Step(currentKey, _StepType.walk, walkMinutes: walk.minutes),
           );
         }
