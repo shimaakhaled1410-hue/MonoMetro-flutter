@@ -91,7 +91,8 @@ const Map<String, String> translationsAr = {
   'location_permission_title': 'صلاحيات الموقع',
   'location_permission_denied': 'تم رفض إذن الوصول للموقع الجغرافي.',
   'location_permission_denied_forever':
-      'صلاحيات الموقع مرفوضة تماماً من إعدادات الهاتف.',
+      'إذن الموقع مغلق. افتح إعدادات التطبيق واسمح بالوصول للموقع لتحديد أقرب محطة.',
+  'open_settings': 'فتح الإعدادات',
   'location_error_title': 'خطأ في تحديد الموقع',
   'location_error_desc': 'تعذر تحديد موقعك. حاول مرة أخرى في مكان مفتوح.',
   'select_transit_type': 'اختر نوع وسيلة النقل',

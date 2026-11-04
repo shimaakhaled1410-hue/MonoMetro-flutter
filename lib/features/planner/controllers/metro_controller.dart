@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:metro/core/utils/app_snackbar.dart';
+import 'package:metro/core/widgets/location_settings_dialog.dart';
 import 'package:metro/features/history/controllers/history_controller.dart';
 import 'package:metro/features/planner/controllers/passenger_controller.dart';
 import 'package:metro/models/routing_preference.dart';
@@ -185,8 +186,7 @@ class MetroController extends GetxController {
       final result = await LocationService.getCurrentPosition();
       final position = result.position;
       if (position == null) {
-        final (title, message) = _locationMessage(result.failure);
-        AppSnackbar.warning(title: title.tr, message: message.tr);
+        _handleLocationFailure(result.failure);
         return;
       }
       selectStartStation(
@@ -198,6 +198,26 @@ class MetroController extends GetxController {
       );
     } finally {
       isLoadingLocation.value = false;
+    }
+  }
+
+  Future<void> _handleLocationFailure(LocationFailure? failure) async {
+    final (title, message) = _locationMessage(failure);
+    switch (failure) {
+      case LocationFailure.serviceDisabled:
+        await LocationSettingsDialog.show(
+          title: title.tr,
+          message: message.tr,
+          onOpenSettings: LocationService.openLocationSettings,
+        );
+      case LocationFailure.permissionDeniedForever:
+        await LocationSettingsDialog.show(
+          title: title.tr,
+          message: message.tr,
+          onOpenSettings: LocationService.openAppSettings,
+        );
+      default:
+        AppSnackbar.warning(title: title.tr, message: message.tr);
     }
   }
 

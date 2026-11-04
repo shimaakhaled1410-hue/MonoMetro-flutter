@@ -23,6 +23,22 @@ class LocationResult {
 class LocationService {
   const LocationService._();
 
+  static Future<void> openLocationSettings() async {
+    try {
+      await Geolocator.openLocationSettings();
+    } catch (_) {
+      return;
+    }
+  }
+
+  static Future<void> openAppSettings() async {
+    try {
+      await Geolocator.openAppSettings();
+    } catch (_) {
+      return;
+    }
+  }
+
   static Future<LocationResult> getCurrentPosition() async {
     try {
       if (!await Geolocator.isLocationServiceEnabled()) {
