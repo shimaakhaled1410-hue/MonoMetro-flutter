@@ -105,4 +105,7 @@ const Map<String, String> translationsAr = {
   'landmarks': 'أشهر المعالم',
   'landmarks_title': 'وجهات ومعالم شهيرة',
   'landmarks_subtitle': 'اختر وجهتك لتحديد المحطة فوراً',
+  'today': 'اليوم',
+  'yesterday': 'أمس',
+  'trip_details': 'تفاصيل الرحلة',
 };

@@ -106,4 +106,7 @@ const Map<String, String> translationsEn = {
   'landmarks': 'Famous Landmarks',
   'landmarks_title': 'Popular Destinations',
   'landmarks_subtitle': 'Select a place to set destination',
+  'today': 'Today',
+  'yesterday': 'Yesterday',
+  'trip_details': 'Trip Details',
 };

@@ -14,7 +14,7 @@ class InitialBinding extends Bindings {
     Get.put(SettingsController(settings), permanent: true);
     final history = Get.put(HistoryController(), permanent: true);
     final passenger = Get.put(PassengerController(settings), permanent: true);
-    final graph = MetroGraphService();
+    final graph = Get.put(MetroGraphService(), permanent: true);
 
     for (final network in TransitNetwork.values) {
       Get.put(

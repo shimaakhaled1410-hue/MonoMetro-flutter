@@ -15,6 +15,7 @@ class VerticalTimeline extends StatelessWidget {
     final entries = TimelineEntry.build(trip);
 
     return Card(
+      margin: EdgeInsets.zero,
       child: Padding(
         padding: const EdgeInsets.fromLTRB(18, 18, 18, 14),
         child: Column(

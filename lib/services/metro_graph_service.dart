@@ -110,6 +110,101 @@ class MetroGraphService {
     return 0;
   }
 
+  /// Rebuilds the segments of a previously saved trip from its ordered station
+  /// names, so saved trips can be shown with lines, transfers and walks.
+  /// Returns null if the stored path no longer matches the network.
+  TripResult? rebuildTrip(
+    List<String> stationNames,
+    PassengerType passengerType,
+  ) {
+    if (stationNames.length < 2) return null;
+    if (stationNames.any((name) => StationRepository.byName(name) == null)) {
+      return null;
+    }
+
+    final hops = <_Hop>[];
+    TransitLine? current;
+
+    for (var i = 0; i < stationNames.length - 1; i++) {
+      final from = stationNames[i];
+      final to = stationNames[i + 1];
+      final lines = _linesBetween(from, to);
+
+      if (lines.isEmpty) {
+        if (!isWalkLinked(from, to)) return null;
+        final fromLine = StationRepository.byName(from)!.primaryLine;
+        final toLine = StationRepository.byName(to)!.primaryLine;
+        hops.add(
+          _Hop(
+            _Step('', _StepType.walk, walkMinutes: walkMinutesBetween(from, to)),
+            _State(from, fromLine),
+            _State(to, toLine),
+          ),
+        );
+        current = null;
+        continue;
+      }
+
+      final line = current != null && lines.contains(current)
+          ? current
+          : _longestRun(lines, stationNames, i);
+      if (current != null && current != line) {
+        hops.add(
+          _Hop(
+            _Step('', _StepType.switchLine),
+            _State(from, current),
+            _State(from, line),
+          ),
+        );
+      }
+      hops.add(
+        _Hop(
+          _Step('', _StepType.ride),
+          _State(from, line),
+          _State(to, line),
+        ),
+      );
+      current = line;
+    }
+
+    final segments = _buildSegments(hops);
+    if (segments.isEmpty) return null;
+
+    return TripResult(
+      segments: segments,
+      fare: FareCalculatorService.calculate(segments, passengerType),
+      estimatedTimeMinutes: _estimateMinutes(segments),
+    );
+  }
+
+  List<TransitLine> _linesBetween(String a, String b) {
+    return [
+      for (final edge in _rideEdges[a] ?? const <_RideEdge>[])
+        if (edge.to == b) edge.line,
+    ];
+  }
+
+  TransitLine _longestRun(
+    List<TransitLine> candidates,
+    List<String> names,
+    int index,
+  ) {
+    var best = candidates.first;
+    var bestRun = -1;
+    for (final line in candidates) {
+      var run = 0;
+      for (var j = index; j < names.length - 1; j++) {
+        if (!_linesBetween(names[j], names[j + 1]).contains(line)) break;
+        run++;
+      }
+      if (run > bestRun) {
+        best = line;
+        bestRun = run;
+      }
+    }
+    return best;
+  }
+
   TripResult? calculateTrip(
     String start,
     String end,

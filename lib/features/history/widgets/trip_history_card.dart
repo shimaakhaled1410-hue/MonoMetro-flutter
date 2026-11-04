@@ -1,134 +1,136 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:metro/core/utils/fare_formatter.dart';
+import 'package:metro/core/utils/format_date.dart';
 import 'package:metro/core/utils/format_time.dart';
 import 'package:metro/core/utils/theme_extensions.dart';
+import 'package:metro/features/history/widgets/trip_history_labels.dart';
 import 'package:metro/models/trip_history.dart';
-import 'package:metro/services/station_repository.dart';
 
+/// Saved trip in the history list. Tap to open details, swipe to delete.
 class TripHistoryCard extends StatelessWidget {
   const TripHistoryCard({
     super.key,
     required this.item,
+    required this.onTap,
     required this.onDelete,
   });
 
   final TripHistory item;
+  final VoidCallback onTap;
   final VoidCallback onDelete;
-
-  String _stationName(String name) {
-    return StationRepository.byName(name)?.localizedName ?? name;
-  }
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDark;
-    final start = _stationName(item.startStation);
-    final tag = item.destinationTag;
-    final end = (tag != null && tag.isNotEmpty)
-        ? '$tag (${_stationName(item.endStation)})'
-        : _stationName(item.endStation);
     final palette = context.palette;
     final badgeColor = palette.passengerColor(item.passengerType);
-    final routeNames = item.routeStations.map(_stationName).toList();
+    final fare = FareFormatter.format(item.fare);
 
-    return Card(
-      margin: const EdgeInsets.only(bottom: 14),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(18, 16, 8, 14),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text.rich(
-                    TextSpan(
-                      children: [
-                        TextSpan(text: start),
-                        WidgetSpan(
-                          alignment: PlaceholderAlignment.middle,
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 6),
-                            child: Icon(
-                              Icons.arrow_forward_rounded,
-                              size: 16,
-                              color: palette.muted,
-                            ),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Dismissible(
+        key: ValueKey('dismiss_${item.id}'),
+        direction: DismissDirection.endToStart,
+        onDismissed: (_) => onDelete(),
+        background: Container(
+          alignment: AlignmentDirectional.centerEnd,
+          padding: const EdgeInsetsDirectional.only(end: 24),
+          decoration: BoxDecoration(
+            color: palette.danger.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Icon(Icons.delete_outline_rounded, color: palette.danger),
+        ),
+        child: Card(
+          margin: EdgeInsets.zero,
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: onTap,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(18, 16, 14, 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    formatClock(item.timestamp),
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: palette.muted,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text.rich(
+                          TextSpan(
+                            children: [
+                              TextSpan(text: item.startLabel),
+                              WidgetSpan(
+                                alignment: PlaceholderAlignment.middle,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 6,
+                                  ),
+                                  child: Icon(
+                                    Icons.arrow_forward_rounded,
+                                    size: 16,
+                                    color: palette.muted,
+                                  ),
+                                ),
+                              ),
+                              TextSpan(text: item.endLabel),
+                            ],
+                          ),
+                          style: TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 16,
+                            color: palette.text,
                           ),
                         ),
-                        TextSpan(text: end),
-                      ],
-                    ),
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 16,
-                    ),
+                      ),
+                      Icon(
+                        Icons.arrow_forward_ios_rounded,
+                        size: 14,
+                        color: palette.muted,
+                      ),
+                    ],
                   ),
-                ),
-                IconButton(
-                  icon: Icon(Icons.delete_outline_rounded, color: palette.muted),
-                  onPressed: onDelete,
-                ),
-              ],
-            ),
-            const SizedBox(height: 4),
-            Padding(
-              padding: const EdgeInsetsDirectional.only(end: 10),
-              child: Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  _Pill(
-                    text: item.passengerType.labelKey.tr,
-                    background: badgeColor.withValues(
-                      alpha: isDark ? 0.22 : 0.12,
-                    ),
-                    foreground: badgeColor,
+                  const SizedBox(height: 12),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      _Pill(
+                        text: item.passengerType.labelKey.tr,
+                        background: badgeColor.withValues(
+                          alpha: context.isDark ? 0.22 : 0.12,
+                        ),
+                        foreground: badgeColor,
+                      ),
+                      _Pill(
+                        text: '${item.stationCount} ${'stations'.tr}',
+                        background: palette.field,
+                        foreground: palette.text,
+                      ),
+                      _Pill(
+                        text: formatTripDuration(item.timeInMinutes),
+                        background: palette.field,
+                        foreground: palette.text,
+                      ),
+                      if (fare != null)
+                        _Pill(
+                          text: fare,
+                          background: palette.field,
+                          foreground: palette.text,
+                        ),
+                    ],
                   ),
-                  _Pill(
-                    text: '${item.stationCount} ${'stations'.tr}',
-                    background: palette.field,
-                    foreground: palette.text,
-                  ),
-                  _Pill(
-                    text: formatTripDuration(item.timeInMinutes),
-                    background: palette.field,
-                    foreground: palette.text,
-                  ),
-                  if (FareFormatter.format(item.fare) case final fare?)
-                    _Pill(
-                      text: fare,
-                      background: palette.field,
-                      foreground: palette.text,
-                    ),
                 ],
               ),
             ),
-            const SizedBox(height: 12),
-            SizedBox(
-              height: 36,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsetsDirectional.only(end: 10),
-                itemCount: routeNames.length,
-                separatorBuilder: (_, _) => Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                  child: Icon(
-                    Icons.chevron_right_rounded,
-                    size: 16,
-                    color: palette.muted,
-                  ),
-                ),
-                itemBuilder: (_, index) => Center(
-                  child: Text(
-                    routeNames[index],
-                    style: TextStyle(fontSize: 12, color: palette.muted),
-                  ),
-                ),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
