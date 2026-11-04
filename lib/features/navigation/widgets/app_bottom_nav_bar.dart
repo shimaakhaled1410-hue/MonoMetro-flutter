@@ -14,6 +14,8 @@ class _NavDestination {
   final IconData activeIcon;
 }
 
+/// Floating pill navigation bar. Only the selected destination shows its
+/// label, which keeps the bar light and lets the content breathe.
 class AppBottomNavBar extends StatelessWidget {
   const AppBottomNavBar({
     super.key,
@@ -49,38 +51,44 @@ class AppBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDark;
+    final palette = context.palette;
+    final radius = BorderRadius.circular(32);
 
-    return Container(
-      decoration: BoxDecoration(
-        color: context.surfaceColor,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-        boxShadow: [
-          BoxShadow(
-            color: context.palette.shadow.withValues(alpha: isDark ? 0.4 : 0.06),
-            blurRadius: 14,
-            offset: const Offset(0, -4),
-          ),
-        ],
-        border: Border(
-          top: BorderSide(color: context.borderColor),
+    return SafeArea(
+      top: false,
+      minimum: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: radius,
+          boxShadow: [
+            BoxShadow(
+              color: palette.shadow.withValues(
+                alpha: context.isDark ? 0.45 : 0.10,
+              ),
+              blurRadius: 28,
+              offset: const Offset(0, 10),
+            ),
+          ],
         ),
-      ),
-      child: SafeArea(
-        top: false,
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(minHeight: 68),
-          child: Row(
-            children: [
-              for (var i = 0; i < _destinations.length; i++)
-                Expanded(
-                  child: _NavItem(
+        child: Material(
+          color: palette.surface,
+          shape: RoundedRectangleBorder(
+            borderRadius: radius,
+            side: BorderSide(color: palette.border),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                for (var i = 0; i < _destinations.length; i++)
+                  _NavItem(
                     destination: _destinations[i],
                     isSelected: currentIndex == i,
                     onTap: () => onTap(i),
                   ),
-                ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -101,55 +109,50 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDark;
-    final accent = context.brand;
-    final inactive = context.mutedColor;
+    final palette = context.palette;
     final label = destination.labelKey.tr;
+    final foreground = isSelected ? palette.onCta : palette.muted;
+    const shape = StadiumBorder();
 
     return Semantics(
       button: true,
       selected: isSelected,
       label: label,
-      child: InkWell(
-        onTap: onTap,
-        splashColor: Colors.transparent,
-        highlightColor: Colors.transparent,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 4,
-                ),
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? accent.withValues(alpha: isDark ? 0.25 : 0.12)
-                      : Colors.transparent,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Icon(
-                  isSelected ? destination.activeIcon : destination.icon,
-                  size: 24,
-                  color: isSelected ? accent : inactive,
-                ),
+      child: AnimatedSize(
+        duration: const Duration(milliseconds: 220),
+        curve: Curves.easeOutCubic,
+        alignment: AlignmentDirectional.centerStart,
+        child: Material(
+          color: isSelected ? palette.cta : Colors.transparent,
+          shape: shape,
+          child: InkWell(
+            customBorder: shape,
+            onTap: onTap,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    isSelected ? destination.activeIcon : destination.icon,
+                    size: 24,
+                    color: foreground,
+                  ),
+                  if (isSelected) ...[
+                    const SizedBox(width: 8),
+                    Text(
+                      label,
+                      maxLines: 1,
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: foreground,
+                      ),
+                    ),
+                  ],
+                ],
               ),
-              const SizedBox(height: 3),
-              Text(
-                label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                  color: isSelected ? accent : inactive,
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),

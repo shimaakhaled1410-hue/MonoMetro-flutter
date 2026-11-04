@@ -16,19 +16,19 @@ class VerticalTimeline extends StatelessWidget {
 
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(18, 18, 18, 14),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               'stations_timeline'.tr,
               style: TextStyle(
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w700,
                 fontSize: 16,
-                color: context.brand,
+                color: context.onSurfaceStrong,
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 14),
             for (final entry in entries) TimelineStationRow(entry: entry),
           ],
         ),

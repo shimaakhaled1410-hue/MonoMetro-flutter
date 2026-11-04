@@ -99,7 +99,7 @@ class _StationPickerSheetState extends State<StationPickerSheet>
         height: MediaQuery.of(context).size.height * 0.78,
         decoration: BoxDecoration(
           color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
         ),
         child: Column(
           children: [
@@ -142,7 +142,7 @@ class _StationPickerSheetState extends State<StationPickerSheet>
                   filled: true,
                   fillColor: context.fieldColor,
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(16),
                     borderSide: BorderSide.none,
                   ),
                   hintText: 'search_station'.tr,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:metro/core/constants/legal_texts.dart';
 import 'package:metro/core/utils/theme_extensions.dart';
+import 'package:metro/features/settings/widgets/settings_section.dart';
 
 class LegalCard extends StatelessWidget {
   const LegalCard({super.key});
@@ -11,7 +12,6 @@ class LegalCard extends StatelessWidget {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           title: Row(
             children: [
               Icon(Icons.policy_outlined, color: dialogContext.brand),
@@ -60,10 +60,11 @@ class LegalCard extends StatelessWidget {
     required String Function(String languageCode) contentOf,
   }) {
     return ListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16),
       leading: Icon(icon),
       title: Text(titleKey.tr),
       trailing: Icon(
-        Icons.arrow_forward_ios,
+        Icons.arrow_forward_ios_rounded,
         size: 16,
         color: context.mutedColor,
         // matchTextDirection: true,
@@ -78,41 +79,23 @@ class LegalCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(Icons.security_rounded, color: context.brand),
-                const SizedBox(width: 10),
-                Text(
-                  'legal_title'.tr,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-            const Divider(height: 24),
-            _item(
-              context,
-              icon: Icons.privacy_tip_outlined,
-              titleKey: 'privacy_policy',
-              contentOf: LegalTexts.getPrivacyPolicy,
-            ),
-            _item(
-              context,
-              icon: Icons.description_outlined,
-              titleKey: 'terms_conditions',
-              contentOf: LegalTexts.getTermsConditions,
-            ),
-          ],
+    return SettingsSection(
+      icon: Icons.security_rounded,
+      title: 'legal_title'.tr,
+      children: [
+        _item(
+          context,
+          icon: Icons.privacy_tip_outlined,
+          titleKey: 'privacy_policy',
+          contentOf: LegalTexts.getPrivacyPolicy,
         ),
-      ),
+        _item(
+          context,
+          icon: Icons.description_outlined,
+          titleKey: 'terms_conditions',
+          contentOf: LegalTexts.getTermsConditions,
+        ),
+      ],
     );
   }
 }

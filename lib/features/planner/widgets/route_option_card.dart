@@ -32,61 +32,84 @@ class RouteOptionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final details = _details();
     final palette = context.palette;
-    final primary = context.brand;
+    final radius = BorderRadius.circular(22);
 
-    final background = isSelected ? palette.selectedRoute : context.surfaceColor;
+    final titleColor =
+        isSelected ? palette.onSelectedRouteMuted : context.mutedColor;
+    final mainColor =
+        isSelected ? palette.onSelectedRoute : context.onSurfaceStrong;
+    final subColor =
+        isSelected ? palette.onSelectedRouteMuted : context.mutedColor;
 
     return Semantics(
       button: true,
       selected: isSelected,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(14),
-        child: Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: background,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(
-              color: isSelected ? primary : context.borderColor,
-              width: 1.5,
-            ),
+      child: Material(
+        color: isSelected ? palette.selectedRoute : context.surfaceColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: radius,
+          side: BorderSide(
+            color: isSelected ? palette.selectedRoute : context.borderColor,
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 13,
-                  color: isSelected ? palette.onSelectedRoute : primary,
+        ),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: radius,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 12,
+                          color: titleColor,
+                        ),
+                      ),
+                    ),
+                    if (isSelected)
+                      Icon(
+                        Icons.check_circle_rounded,
+                        size: 18,
+                        color: palette.onSelectedRoute,
+                      ),
+                  ],
                 ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                '${trip.stationCount} ${'stations'.tr} • ${formatTripDuration(trip.estimatedTimeMinutes)}',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: isSelected
-                      ? palette.onSelectedRouteMuted
-                      : context.mutedColor,
-                ),
-              ),
-              if (details != null) ...[
-                const SizedBox(height: 4),
+                const SizedBox(height: 10),
                 Text(
-                  details,
+                  formatTripDuration(trip.estimatedTimeMinutes),
                   style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12,
-                    color: isSelected
-                        ? palette.onSelectedRoute
-                        : context.onSurfaceStrong,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 24,
+                    height: 1.1,
+                    color: mainColor,
                   ),
                 ),
+                const SizedBox(height: 6),
+                Text(
+                  '${trip.stationCount} ${'stations'.tr}',
+                  style: TextStyle(fontSize: 12, color: subColor),
+                ),
+                if (details != null) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    details,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 12,
+                      color: mainColor,
+                    ),
+                  ),
+                ],
               ],
-            ],
+            ),
           ),
         ),
       ),

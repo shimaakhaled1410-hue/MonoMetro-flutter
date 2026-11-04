@@ -20,23 +20,22 @@ class StationTile extends StatelessWidget {
     final isDark = context.isDark;
 
     return InkWell(
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(16),
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
           color: context.fieldColor,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: context.borderColor),
+          borderRadius: BorderRadius.circular(16),
         ),
         child: Row(
           children: [
             Container(
-              width: 10,
-              height: 10,
+              width: 4,
+              height: 30,
               decoration: BoxDecoration(
                 color: context.lineColor(station.primaryLine),
-                shape: BoxShape.circle,
+                borderRadius: BorderRadius.circular(4),
               ),
             ),
             const SizedBox(width: 12),

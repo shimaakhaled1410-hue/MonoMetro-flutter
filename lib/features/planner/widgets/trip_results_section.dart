@@ -12,8 +12,6 @@ class TripResultsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final primary = context.brand;
-
     return Obx(() {
       final fastest = controller.fastestTrip.value;
       final comfortable = controller.comfortableTrip.value;
@@ -32,12 +30,12 @@ class TripResultsSection extends StatelessWidget {
           Text(
             hasDistinctOptions ? 'route_options'.tr : 'transit_directions'.tr,
             style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-              color: primary,
+              fontWeight: FontWeight.w700,
+              fontSize: 18,
+              color: context.onSurfaceStrong,
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
           if (hasDistinctOptions)
             IntrinsicHeight(
               child: Row(
@@ -51,7 +49,7 @@ class TripResultsSection extends StatelessWidget {
                       onTap: () => controller.selectRouteOption(0),
                     ),
                   ),
-                  const SizedBox(width: 10),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: RouteOptionCard(
                       title: 'fewest_transfers'.tr,
@@ -71,20 +69,20 @@ class TripResultsSection extends StatelessWidget {
               onTap: () {},
             ),
           const SizedBox(height: 14),
-          OutlinedButton.icon(
-            style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              side: BorderSide(color: primary),
+          FilledButton.tonalIcon(
+            style: FilledButton.styleFrom(
+              backgroundColor: context.fieldColor,
+              foregroundColor: context.onSurfaceStrong,
+              minimumSize: const Size.fromHeight(52),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(18),
               ),
             ),
-            icon: Icon(Icons.bookmark_add_outlined, color: primary),
+            icon: const Icon(Icons.bookmark_add_outlined),
             label: Text(
               'save_trip'.tr,
-              style: TextStyle(
-                color: primary,
-                fontWeight: FontWeight.bold,
+              style: const TextStyle(
+                fontWeight: FontWeight.w700,
                 fontSize: 14,
               ),
             ),

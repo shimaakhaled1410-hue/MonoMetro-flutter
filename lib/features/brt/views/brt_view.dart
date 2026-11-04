@@ -15,7 +15,7 @@ class BrtView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text('nav_brt'.tr)),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [

@@ -11,22 +11,25 @@ class CalculateTripButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
-    final background = color ?? palette.cta;
 
     return SizedBox(
       width: double.infinity,
       child: FilledButton.icon(
         style: FilledButton.styleFrom(
-          backgroundColor: background,
+          backgroundColor: color ?? palette.cta,
           foregroundColor: palette.onCta,
-          padding: const EdgeInsets.symmetric(vertical: 14),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          minimumSize: const Size.fromHeight(58),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         ),
         onPressed: onPressed,
-        icon: const Icon(Icons.alt_route_rounded, size: 20),
+        icon: const Icon(Icons.alt_route_rounded, size: 22),
         label: Text(
           'calculate_trip'.tr,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.2,
+          ),
         ),
       ),
     );

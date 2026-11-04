@@ -74,7 +74,7 @@ class WelcomeView extends StatelessWidget {
                   height: 72,
                   decoration: BoxDecoration(
                     color: primary.withValues(alpha: 0.12),
-                    shape: BoxShape.circle,
+                    borderRadius: BorderRadius.circular(24),
                   ),
                   child: Icon(
                     Icons.directions_subway_rounded,
@@ -88,9 +88,9 @@ class WelcomeView extends StatelessWidget {
                 'welcome_title'.tr,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: primary,
+                  fontSize: 26,
+                  fontWeight: FontWeight.w800,
+                  color: context.onSurfaceStrong,
                 ),
               ),
               const SizedBox(height: 8),
@@ -128,9 +128,9 @@ class WelcomeView extends StatelessWidget {
                 style: FilledButton.styleFrom(
                   backgroundColor: primary,
                   foregroundColor: context.palette.onBrand,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  minimumSize: const Size.fromHeight(58),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
+                    borderRadius: BorderRadius.circular(20),
                   ),
                 ),
                 onPressed: _onContinue,

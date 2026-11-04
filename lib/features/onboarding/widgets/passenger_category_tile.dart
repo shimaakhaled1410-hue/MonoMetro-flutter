@@ -29,7 +29,7 @@ class PassengerCategoryTile extends StatelessWidget {
       label: title,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(22),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.all(16),
@@ -37,7 +37,7 @@ class PassengerCategoryTile extends StatelessWidget {
             color: isSelected
                 ? primary.withValues(alpha: isDark ? 0.15 : 0.06)
                 : context.surfaceColor,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(22),
             border: Border.all(
               color: isSelected ? primary : context.borderColor,
               width: isSelected ? 2 : 1,
@@ -46,11 +46,11 @@ class PassengerCategoryTile extends StatelessWidget {
           child: Row(
             children: [
               Container(
-                width: 46,
-                height: 46,
+                width: 48,
+                height: 48,
                 decoration: BoxDecoration(
                   color: isSelected ? primary : context.fieldColor,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(16),
                 ),
                 child: Icon(
                   icon,

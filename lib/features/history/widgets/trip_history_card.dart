@@ -35,27 +35,25 @@ class TripHistoryCard extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 14),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(18, 16, 8, 14),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                Icon(Icons.route, color: palette.brand),
-                const SizedBox(width: 10),
                 Expanded(
                   child: Text.rich(
                     TextSpan(
                       children: [
                         TextSpan(text: start),
-                        const WidgetSpan(
+                        WidgetSpan(
                           alignment: PlaceholderAlignment.middle,
                           child: Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 6),
+                            padding: const EdgeInsets.symmetric(horizontal: 6),
                             child: Icon(
                               Icons.arrow_forward_rounded,
                               size: 16,
-                              // matchTextDirection: true,
+                              color: palette.muted,
                             ),
                           ),
                         ),
@@ -63,77 +61,105 @@ class TripHistoryCard extends StatelessWidget {
                       ],
                     ),
                     style: const TextStyle(
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w700,
                       fontSize: 16,
                     ),
                   ),
                 ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: badgeColor.withValues(alpha: isDark ? 0.2 : 0.1),
-                    borderRadius: BorderRadius.circular(4),
-                    border: Border.all(
-                      color: badgeColor.withValues(alpha: 0.3),
-                    ),
-                  ),
-                  child: Text(
-                    item.passengerType.labelKey.tr,
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
-                      color: badgeColor,
-                    ),
-                  ),
-                ),
                 IconButton(
-                  icon: Icon(Icons.delete_outline, color: palette.danger),
+                  icon: Icon(Icons.delete_outline_rounded, color: palette.muted),
                   onPressed: onDelete,
                 ),
               ],
             ),
-            const SizedBox(height: 8),
-            Text(
-              [
-                '${item.stationCount} ${'stations'.tr}',
-                formatTripDuration(item.timeInMinutes),
-                ?FareFormatter.format(item.fare),
-              ].join(' • '),
-              style: const TextStyle(fontWeight: FontWeight.w500),
+            const SizedBox(height: 4),
+            Padding(
+              padding: const EdgeInsetsDirectional.only(end: 10),
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  _Pill(
+                    text: item.passengerType.labelKey.tr,
+                    background: badgeColor.withValues(
+                      alpha: isDark ? 0.22 : 0.12,
+                    ),
+                    foreground: badgeColor,
+                  ),
+                  _Pill(
+                    text: '${item.stationCount} ${'stations'.tr}',
+                    background: palette.field,
+                    foreground: palette.text,
+                  ),
+                  _Pill(
+                    text: formatTripDuration(item.timeInMinutes),
+                    background: palette.field,
+                    foreground: palette.text,
+                  ),
+                  if (FareFormatter.format(item.fare) case final fare?)
+                    _Pill(
+                      text: fare,
+                      background: palette.field,
+                      foreground: palette.text,
+                    ),
+                ],
+              ),
             ),
             const SizedBox(height: 12),
             SizedBox(
-              height: 44,
+              height: 36,
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
+                padding: const EdgeInsetsDirectional.only(end: 10),
                 itemCount: routeNames.length,
                 separatorBuilder: (_, _) => Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 4),
                   child: Icon(
-                    Icons.arrow_forward,
-                    size: 14,
+                    Icons.chevron_right_rounded,
+                    size: 16,
                     color: palette.muted,
-                    // matchTextDirection: true,
                   ),
                 ),
                 itemBuilder: (_, index) => Center(
-                  child: Chip(
-                    visualDensity: VisualDensity.compact,
-                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    label: Text(
-                      routeNames[index],
-                      style: const TextStyle(fontSize: 12),
-                    ),
-                    backgroundColor: palette.field,
-                    side: BorderSide.none,
+                  child: Text(
+                    routeNames[index],
+                    style: TextStyle(fontSize: 12, color: palette.muted),
                   ),
                 ),
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _Pill extends StatelessWidget {
+  const _Pill({
+    required this.text,
+    required this.background,
+    required this.foreground,
+  });
+
+  final String text;
+  final Color background;
+  final Color foreground;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: background,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          color: foreground,
         ),
       ),
     );

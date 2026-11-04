@@ -12,12 +12,12 @@ class SettingsView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text('settings_title'.tr)),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
         children: const [
           AppearanceCard(),
-          SizedBox(height: 12),
+          SizedBox(height: 24),
           LanguageCard(),
-          SizedBox(height: 12),
+          SizedBox(height: 24),
           LegalCard(),
         ],
       ),
