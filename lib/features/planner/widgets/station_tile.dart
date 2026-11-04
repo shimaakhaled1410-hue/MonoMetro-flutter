@@ -22,12 +22,8 @@ class StationTile extends StatelessWidget {
     return InkWell(
       borderRadius: BorderRadius.circular(16),
       onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        decoration: BoxDecoration(
-          color: context.fieldColor,
-          borderRadius: BorderRadius.circular(16),
-        ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
         child: Row(
           children: [
             Container(
@@ -38,7 +34,7 @@ class StationTile extends StatelessWidget {
                 borderRadius: BorderRadius.circular(4),
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -55,7 +51,7 @@ class StationTile extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       station.lines.map((line) => line.labelKey.tr).join(' | '),
-                      style: TextStyle(fontSize: 11, color: context.mutedColor),
+                      style: TextStyle(fontSize: 12, color: context.mutedColor),
                     ),
                   ],
                 ],
@@ -63,26 +59,25 @@ class StationTile extends StatelessWidget {
             ),
             if (station.isInterchange)
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: context.brand.withValues(alpha: isDark ? 0.2 : 0.1),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
                   'transfer'.tr,
                   style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
                     color: context.brand,
                   ),
                 ),
               ),
-            const SizedBox(width: 6),
+            const SizedBox(width: 8),
             Icon(
-              Icons.arrow_forward_ios,
+              Icons.arrow_forward_ios_rounded,
               size: 14,
               color: context.mutedColor,
-              // matchTextDirection: true,
             ),
           ],
         ),

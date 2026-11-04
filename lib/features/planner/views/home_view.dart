@@ -5,7 +5,7 @@ import 'package:metro/core/widgets/quick_action_chip.dart';
 import 'package:metro/features/planner/controllers/metro_controller.dart';
 import 'package:metro/features/planner/views/metro_map_view.dart';
 import 'package:metro/features/planner/widgets/calculate_trip_button.dart';
-import 'package:metro/features/planner/widgets/landmarks_dialog.dart';
+import 'package:metro/features/planner/widgets/landmarks_sheet.dart';
 import 'package:metro/features/planner/widgets/passenger_badge_card.dart';
 import 'package:metro/features/planner/widgets/station_picker_sheet.dart';
 import 'package:metro/features/planner/widgets/transit_type_sheet.dart';
@@ -88,12 +88,10 @@ class HomeView extends StatelessWidget {
                   QuickActionChip(
                     icon: Icons.explore_rounded,
                     label: Text('landmarks'.tr),
-                    onPressed: () => showDialog<void>(
-                      context: context,
-                      builder: (_) => LandmarksDialog(
-                        onSelect: (station, title) =>
-                            controller.selectEndStation(station, tag: title),
-                      ),
+                    onPressed: () => LandmarksSheet.show(
+                      context,
+                      onSelect: (station, title) =>
+                          controller.selectEndStation(station, tag: title),
                     ),
                   ),
                 ],

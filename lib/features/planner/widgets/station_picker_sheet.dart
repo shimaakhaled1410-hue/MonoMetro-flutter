@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:metro/core/utils/theme_extensions.dart';
+import 'package:metro/core/widgets/app_sheet.dart';
 import 'package:metro/features/planner/widgets/station_tile.dart';
 import 'package:metro/models/station.dart';
 import 'package:metro/models/transit_line.dart';
@@ -26,10 +27,8 @@ class StationPickerSheet extends StatefulWidget {
     required TransitNetwork network,
     required ValueChanged<Station> onSelected,
   }) {
-    return showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
+    return AppSheet.show<void>(
+      context,
       builder: (sheetContext) => StationPickerSheet(
         title: title,
         network: network,
@@ -45,22 +44,14 @@ class StationPickerSheet extends StatefulWidget {
   State<StationPickerSheet> createState() => _StationPickerSheetState();
 }
 
-class _StationPickerSheetState extends State<StationPickerSheet>
-    with SingleTickerProviderStateMixin {
-  late final TabController _tabController;
+class _StationPickerSheetState extends State<StationPickerSheet> {
   late final List<TransitLine> _lines = widget.network.lines;
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: _lines.length, vsync: this);
-  }
+  int _lineIndex = 0;
 
   @override
   void dispose() {
-    _tabController.dispose();
     _searchController.dispose();
     super.dispose();
   }
@@ -68,16 +59,23 @@ class _StationPickerSheetState extends State<StationPickerSheet>
   Widget _buildStationList(List<Station> stations, {bool showLines = false}) {
     if (stations.isEmpty) {
       return Center(
-        child: Text(
-          'no_results'.tr,
-          style: TextStyle(color: context.mutedColor),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.search_off_rounded, size: 40, color: context.mutedColor),
+            const SizedBox(height: 8),
+            Text(
+              'no_results'.tr,
+              style: TextStyle(color: context.mutedColor),
+            ),
+          ],
         ),
       );
     }
     return ListView.separated(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.fromLTRB(12, 4, 12, 16),
       itemCount: stations.length,
-      separatorBuilder: (_, _) => const SizedBox(height: 6),
+      separatorBuilder: (_, _) => Divider(height: 1, indent: 28, endIndent: 8),
       itemBuilder: (_, index) => StationTile(
         station: stations[index],
         showLines: showLines,
@@ -86,132 +84,126 @@ class _StationPickerSheetState extends State<StationPickerSheet>
     );
   }
 
+  Widget _buildSearchField() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+      child: TextField(
+        controller: _searchController,
+        decoration: InputDecoration(
+          hintText: 'search_station'.tr,
+          prefixIcon: const Icon(Icons.search_rounded, size: 22),
+          suffixIcon: _searchQuery.isNotEmpty
+              ? IconButton(
+                  icon: const Icon(Icons.close_rounded, size: 18),
+                  onPressed: () {
+                    _searchController.clear();
+                    setState(() => _searchQuery = '');
+                  },
+                )
+              : null,
+        ),
+        onChanged: (value) => setState(() => _searchQuery = value),
+      ),
+    );
+  }
+
+  Widget _buildLineChips() {
+    return SizedBox(
+      height: 44,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        itemCount: _lines.length,
+        separatorBuilder: (_, _) => const SizedBox(width: 8),
+        itemBuilder: (_, index) => _LineChip(
+          line: _lines[index],
+          selected: index == _lineIndex,
+          onTap: () => setState(() => _lineIndex = index),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final isDark = context.isDark;
-    final primary = context.brand;
     final isSearching = _searchQuery.trim().isNotEmpty;
-    final keyboardInset = MediaQuery.of(context).viewInsets.bottom;
 
-    return Padding(
-      padding: EdgeInsets.only(bottom: keyboardInset),
-      child: Container(
-        height: MediaQuery.of(context).size.height * 0.78,
-        decoration: BoxDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-        ),
-        child: Column(
-          children: [
-            const SizedBox(height: 10),
-            Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: context.palette.borderStrong,
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-            const SizedBox(height: 12),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      widget.title,
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold,
-                        color: isDark ? context.onSurfaceStrong : primary,
-                      ),
-                    ),
+    return AppSheet(
+      title: widget.title,
+      heightFactor: 0.82,
+      child: Column(
+        children: [
+          _buildSearchField(),
+          if (!isSearching && _lines.length > 1) ...[
+            _buildLineChips(),
+            const SizedBox(height: 8),
+          ],
+          Expanded(
+            child: isSearching
+                ? _buildStationList(
+                    StationSearchService.search(_searchQuery, widget.network),
+                    showLines: true,
+                  )
+                : _buildStationList(
+                    StationRepository.forLine(_lines[_lineIndex]),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.close, size: 20),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-              child: TextField(
-                controller: _searchController,
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: context.fieldColor,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide.none,
-                  ),
-                  hintText: 'search_station'.tr,
-                  prefixIcon: const Icon(Icons.search, size: 20),
-                  suffixIcon: _searchQuery.isNotEmpty
-                      ? IconButton(
-                          icon: const Icon(Icons.clear, size: 18),
-                          onPressed: () {
-                            _searchController.clear();
-                            setState(() => _searchQuery = '');
-                          },
-                        )
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LineChip extends StatelessWidget {
+  const _LineChip({
+    required this.line,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final TransitLine line;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.palette;
+    final foreground = selected ? palette.onCta : palette.text;
+    const shape = StadiumBorder();
+
+    return Material(
+      color: selected ? palette.cta : palette.field,
+      shape: shape,
+      child: InkWell(
+        customBorder: shape,
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 10,
+                height: 10,
+                decoration: BoxDecoration(
+                  color: palette.lineColor(line),
+                  shape: BoxShape.circle,
+                  border: selected
+                      ? Border.all(color: palette.onCta, width: 1.5)
                       : null,
                 ),
-                onChanged: (value) => setState(() => _searchQuery = value),
               ),
-            ),
-            if (isSearching) ...[
-              const SizedBox(height: 8),
-              Expanded(
-                child: _buildStationList(
-                  StationSearchService.search(_searchQuery, widget.network),
-                  showLines: true,
-                ),
-              ),
-            ] else if (_lines.length == 1) ...[
-              const SizedBox(height: 8),
-              Expanded(
-                child: _buildStationList(
-                  StationRepository.forLine(_lines.first),
-                ),
-              ),
-            ] else ...[
-              TabBar(
-                controller: _tabController,
-                indicatorColor: primary,
-                labelColor: primary,
-                unselectedLabelColor: context.mutedColor,
-                isScrollable: true,
-                tabAlignment: TabAlignment.start,
-                labelStyle: const TextStyle(fontWeight: FontWeight.bold),
-                tabs: [
-                  for (final line in _lines)
-                    Tab(
-                      child: Row(
-                        children: [
-                          CircleAvatar(
-                            radius: 4,
-                            backgroundColor: context.lineColor(line),
-                          ),
-                          const SizedBox(width: 6),
-                          Text(line.labelKey.tr),
-                        ],
-                      ),
-                    ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Expanded(
-                child: TabBarView(
-                  controller: _tabController,
-                  children: [
-                    for (final line in _lines)
-                      _buildStationList(StationRepository.forLine(line)),
-                  ],
+              const SizedBox(width: 8),
+              Text(
+                line.labelKey.tr,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: foreground,
                 ),
               ),
             ],
-          ],
+          ),
         ),
       ),
     );
