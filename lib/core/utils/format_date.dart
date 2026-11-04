@@ -2,7 +2,14 @@ import 'package:get/get.dart';
 
 String _two(int value) => value.toString().padLeft(2, '0');
 
-String formatClock(DateTime date) => '${_two(date.hour)}:${_two(date.minute)}';
+/// 12-hour clock with an AM/PM marker (ص/م in Arabic), e.g. "10:58 AM".
+String formatClock(DateTime date) {
+  final isAr = Get.locale?.languageCode == 'ar';
+  final hour = date.hour % 12 == 0 ? 12 : date.hour % 12;
+  final isPm = date.hour >= 12;
+  final marker = isAr ? (isPm ? 'م' : 'ص') : (isPm ? 'PM' : 'AM');
+  return '$hour:${_two(date.minute)} $marker';
+}
 
 String formatDay(DateTime date) {
   return '${_two(date.day)}/${_two(date.month)}/${date.year}';
