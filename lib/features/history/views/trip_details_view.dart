@@ -18,9 +18,16 @@ class TripDetailsView extends StatelessWidget {
 
   final TripHistory item;
 
-  void _delete() {
-    Get.find<HistoryController>().deleteItemWithUndo(item);
-    Get.back<void>();
+  /// Pops the screen and deletes in the same synchronous step. The second
+  /// tap of a double tap finds the trip already gone and does nothing, so the
+  /// screen can't be popped twice. The undo snackbar then shows on the list.
+  void _delete(BuildContext context) {
+    final controller = Get.find<HistoryController>();
+    final exists = controller.historyList.any((trip) => trip.id == item.id);
+    if (!exists) return;
+
+    Navigator.of(context).pop();
+    controller.deleteItemWithUndo(item);
   }
 
   @override
@@ -49,21 +56,7 @@ class TripDetailsView extends StatelessWidget {
     ];
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('trip_details'.tr),
-        actions: [
-          IconButton(
-            tooltip: 'delete'.tr,
-            style: IconButton.styleFrom(
-              backgroundColor: context.fieldColor,
-              foregroundColor: context.palette.danger,
-            ),
-            icon: const Icon(Icons.delete_outline_rounded),
-            onPressed: _delete,
-          ),
-          const SizedBox(width: 12),
-        ],
-      ),
+      appBar: AppBar(title: Text('trip_details'.tr)),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
         children: [
@@ -75,6 +68,17 @@ class TripDetailsView extends StatelessWidget {
             VerticalTimeline(trip: trip)
           else
             _StopsFallback(names: item.routeStations),
+          const SizedBox(height: 24),
+          Center(
+            child: TextButton.icon(
+              style: TextButton.styleFrom(
+                foregroundColor: context.palette.danger,
+              ),
+              icon: const Icon(Icons.delete_outline_rounded, size: 20),
+              label: Text('delete'.tr),
+              onPressed: () => _delete(context),
+            ),
+          ),
         ],
       ),
     );
