@@ -93,6 +93,7 @@ const Map<String, String> translationsAr = {
   'location_permission_denied_forever':
       'إذن الموقع مغلق. افتح إعدادات التطبيق واسمح بالوصول للموقع لتحديد أقرب محطة.',
   'open_settings': 'فتح الإعدادات',
+  'press_back_again': 'اضغط رجوع مرة أخرى للخروج',
   'location_error_title': 'خطأ في تحديد الموقع',
   'location_error_desc': 'تعذر تحديد موقعك. حاول مرة أخرى في مكان مفتوح.',
   'select_transit_type': 'اختر نوع وسيلة النقل',

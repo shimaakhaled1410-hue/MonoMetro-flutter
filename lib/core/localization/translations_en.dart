@@ -92,6 +92,7 @@ const Map<String, String> translationsEn = {
   'location_permission_denied_forever':
       'Location permission is blocked. Open the app settings and allow location access to find the nearest station.',
   'open_settings': 'Open Settings',
+  'press_back_again': 'Press back again to exit',
   'location_error_title': 'Location Error',
   'location_error_desc':
       'Could not determine your location. Please try again in an open area.',
