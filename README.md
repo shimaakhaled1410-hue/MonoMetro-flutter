@@ -1,98 +1,112 @@
 # 🚇 MonoMetro
 
-A modern, offline-first transit guide and multimodal route navigation application for the Greater Cairo transit network (Metro Lines 1, 2, 3 & Monorail East), built with **Flutter** and **GetX**. Designed to provide instant route calculations, walking transfer guidance, accurate multimodal fare breakdown based on official transit tiers, and an intelligent offline area guide.
+An **offline-first** transit guide and route planner for **Greater Cairo**: Metro Lines 1, 2 & 3, Monorail East, and the BRT ring. It calculates the best route, the exact multimodal fare, and walking transfers, all without needing mobile data.
+
+Built with **Flutter** and **GetX**, with a feature-first, layered structure. Bilingual (Arabic / English, RTL / LTR) with light and dark themes.
+
+<!-- Keep your existing "App Showcase" screenshots section here (the <img> tags from screenshots/) -->
 
 ---
 
 ## ✨ Features
 
-- **🚀 Smart Multi-Criteria Route Optimization (BFS Graph Traversal):**
-  - **Fastest Route:** Minimizes total stations and transit duration.
-  - **Comfort Route:** Prioritizes fewer line transfers for a smoother commute.
-- **💰 Realistic & Multimodal Fare Calculation:**
-  - Automated fare calculation matching Cairo Metro's official transit tier system.
-  - **Monorail Tiered Pricing:** Dynamic fare calculation for Monorail East (22 stations).
-  - **Combined Trip Fare Breakdown:** Clear split pricing for multimodal commutes (e.g., `20 EGP Monorail + 15 EGP Metro`) across route cards and trip history.
-  - Category-based dynamic pricing (**Standard**, **Seniors 60+**, and **Special Needs**).
-  - Minimum fare unification across alternative routes for the same source-destination pair.
-- **🚝 Monorail East Integration & Smart Transfers:**
-  - Full support for the 22 stations of the Monorail East line (Stadium to Justice City).
-  - **Pedestrian Interchange Detection:** Context-aware walking guidance at Stadium Interchange (~3 min walk) with safety checks against invalid route charges.
-  - Dedicated tab in station selector with official line color branding.
-- **📍 Location-Aware & Offline-First:**
-  - **GPS Integration:** Instant detection of the nearest station using device sensors without mobile data.
-  - **Local Directory Search:** Built-in offline database for 35+ major Cairo landmarks and districts (e.g., Abbas El Akkad, Faisal, El Salam).
-  - Direct integration with Google Maps to view exact station locations.
-- **🗺️ Interactive Timeline & Station Exploration:**
-  - Detailed vertical timeline displaying intermediate stops, official line colors, train directions, and walking transfer instructions.
-  - Complete network overview covering Line 1, Line 2, Line 3, and Monorail East.
-- **📜 Trip History & Search Caching:**
-  - Save recent trips locally with custom destination tags reflecting search queries.
-  - Complete trip summaries including detailed fare breakdowns, duration, and intermediate stops.
-- **🌍 Internationalization & Persistent Theming:**
-  - Full Arabic and English bilingual support (RTL/LTR) with locale persistence across sessions.
-  - Dark and Light modes saved directly to local storage (`shared_preferences`).
-  - Custom animated Splash Screen on startup using GetX and Flutter animation controllers.
+### 🧭 Smart routing
+- **Fastest route** (fewest stops + shortest time) and **Comfort route** (fewest line transfers), both calculated for every search so you can compare them.
+- Routing runs on a **weighted graph with Dijkstra's algorithm**. Each node is a *(station, line)* pair, so changing lines is an explicit edge with its own cost. That is what makes transfer-aware routing possible: the Comfort mode simply makes a transfer extremely expensive.
+- Supports **branching lines** (Line 3 has branches), **loop lines** (BRT ring) and **pedestrian links** between separate networks.
+- Walk-aware transfer: the Stadium ↔ Stadium (Monorail) interchange is modelled as a **10-minute walk** and shown as a walking step in the trip, not as a ride.
+
+### 💰 Accurate multimodal fares
+- Station-count **fare tiers** per mode:
+  - Metro: 10 / 12 / 15 / 20 EGP
+  - Monorail East: 20 / 40 / 55 / 80 EGP
+  - BRT: 5 – 35 EGP across 7 tiers
+- **Passenger categories:** Standard, Seniors 60+ (half fare, rounded up) and Special Needs (flat fare). BRT fares are fixed for all categories.
+- Mixed trips are split into **separate tickets per mode** (e.g. Monorail ticket + Metro ticket) and shown as a clear breakdown in route cards and in history.
+
+### 📍 Location-aware & offline-first
+- **Nearest station** from GPS using the Haversine formula, with graceful handling of every failure case (location off, permission denied, denied forever, timeout).
+- **Offline search** across station names (English + Arabic), plus a directory of **70+ neighbourhoods** and **landmarks** mapped to their nearest station. Arabic search is normalised (diacritics, alef variants, ya / ta marbuta) so users can type naturally.
+- Open any station in **Google Maps** with one tap.
+
+### 🗺️ Trip experience
+- Vertical **timeline** with intermediate stops, line colours, travel direction ("towards …") and walking instructions.
+- **Network overview** map screen for each line.
+- Separate BRT planner tab.
+
+### 📜 Trip history
+- Save trips locally with an optional destination tag.
+- Saved trips store only their station list and are **rebuilt on demand** into full segments, transfers and fares, which keeps history compact.
+- Duplicate-route detection.
+
+### 🌍 Personalisation
+- Full **Arabic / English** support with RTL layout and locale persistence.
+- **Light / Dark** themes, persisted with `shared_preferences`.
+- Animated splash screen, onboarding with passenger-category selection, and a "press back twice to exit" flow.
 
 ---
 
-## 🛠️ Tech Stack & Architecture
+## 🛠️ Tech Stack
 
-- **Framework:** [Flutter](https://flutter.dev/) (Dart SDK `^3.12.2`)
-- **State Management & Navigation:** [GetX](https://pub.dev/packages/get)
-- **Routing Engine:** Multimodal Graph data structure using Breadth-First Search (BFS), transfer penalties, and pedestrian interchange links.
-- **Local Persistence:** `shared_preferences`
-- **Geolocation & External Maps:** `geolocator`, `geocoding`, `url_launcher`
-- **Branding:** `flutter_launcher_icons`
-- **Animations:** Custom `AnimationController` (Fade Transition)
+| Area | Choice |
+|---|---|
+| Framework | Flutter (Dart `^3.12`) |
+| State management & DI | **GetX** (reactive `Rx` state, `Bindings`, tagged controllers per network) |
+| Routing engine | Custom **Dijkstra** over a (station, line) state graph |
+| Persistence | `shared_preferences` (settings, trip history) |
+| Location | `geolocator`, `geocoding` |
+| External maps | `url_launcher` |
+| Branding | `flutter_launcher_icons` |
+| Release build | R8 minification and resource shrinking enabled |
 
 ---
 
-## 📸 App Showcase
+## 🏗️ Architecture
 
-<div align="center">
+```
+lib/
+├── app/                  # App widget, initial bindings (dependency injection)
+├── core/                 # Theme, localization (AR/EN), constants, utilities
+├── data/                 # Static network data: lines, stations, fares, landmarks, areas
+├── models/               # Station, TransitLine, TripResult, FareBreakdown, TripHistory …
+├── services/             # Pure logic, no UI:
+│   ├── metro_graph_service.dart      # Graph build + Dijkstra + trip rebuild
+│   ├── fare_calculator_service.dart  # Per-mode tiered fares
+│   ├── nearest_station_service.dart  # Haversine nearest station
+│   ├── station_search_service.dart   # Normalised bilingual search
+│   ├── location_service.dart         # GPS + permission handling
+│   └── history_service.dart          # Local persistence
+└── features/             # Feature-first UI (views, widgets, controllers)
+    ├── planner/   ├── brt/   ├── history/
+    ├── settings/  ├── onboarding/  └── navigation/
+```
 
-### Splash & Rider Category Setup
-<img src="screenshots/splash.jpg" width="100%" alt="Splash & Setup" />
-
-<br/><br/>
-
-### Route Planning & Interactive Timeline (Arabic - Light Mode)
-<img src="screenshots/stations_ar.jpg" width="100%" alt="Arabic Light Mode" />
-
-<br/><br/>
-
-### Offline Landmarks & Multi-Route Navigation (English - Dark Mode)
-<img src="screenshots/stations_en.jpg" width="100%" alt="English Dark Mode" />
-
-<br/><br/>
-
-### Trip History & App Settings
-<img src="screenshots/history.jpg" width="100%" alt="History and Settings" />
-
-</div>
+**Design decisions**
+- **Services hold all the logic** and have no dependency on widgets, so routing and fare calculation can be unit-tested in isolation.
+- **One `MetroController` per network** (rail and BRT), created with GetX tags, so both planners share the same graph service, passenger type and history without duplicating code.
+- **Network data is declarative** (`LinesData`, `FareData`): adding a station, line or fare tier means editing data, not algorithms.
 
 ---
 
 ## 🚀 Getting Started
 
-### Prerequisites
-- Flutter SDK (`>= 3.12.2`)
-- Android Studio / VS Code
-- Git
+**Prerequisites:** Flutter SDK (Dart ≥ 3.12), Android Studio or VS Code, Git.
 
-### Installation & Run
-
-```
-
+```bash
 # 1. Clone the repository
-git clone [https://github.com/shimaakhaled1410/cairo-metro.git](https://github.com/shimaakhaled1410/cairo-metro.git)
-cd cairo-metro
+git clone https://github.com/shimaakhaled1410-hue/MonoMetro-flutter.git
+cd MonoMetro-flutter
 
 # 2. Install dependencies
 flutter pub get
 
-# 3. Run the application
+# 3. Run the app
 flutter run
-
 ```
+
+---
+
+## 👩‍💻 Author
+
+**Shimaa Khaled**, Flutter Developer
+[GitHub](https://github.com/shimaakhaled1410-hue)
