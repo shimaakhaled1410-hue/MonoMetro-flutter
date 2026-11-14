@@ -4,7 +4,27 @@ An **offline-first** transit guide and route planner for **Greater Cairo**: Metr
 
 Built with **Flutter** and **GetX**, with a feature-first, layered structure. Bilingual (Arabic / English, RTL / LTR) with light and dark themes.
 
-<!-- Keep your existing "App Showcase" screenshots section here (the <img> tags from screenshots/) -->
+## 📸 App Showcase
+
+### Plan your trip in seconds · Follow every station and transfer
+Fastest and fewest-transfer route options with fare, plus a colour-coded step-by-step timeline.
+
+![Trip planning and station timeline](screenshots/Metro_Freelancing_Project_1.png)
+
+### Pick a station easily · Jump to famous landmarks
+Search by name or area, browse by line, or choose a landmark and get its nearest station instantly.
+
+![Station picker and landmarks](screenshots/Metro_Freelancing_Project_2.png)
+
+### Fares for your passenger category · Save and review trips
+Standard, Seniors 60+ and Special Needs pricing, with a trip history and detailed trip breakdown.
+
+![Passenger categories and trip history](screenshots/Metro_Freelancing_Project_3.png)
+
+### BRT planner · Offline metro map
+Plan BRT trips with the same ease, and view the full network map with no internet connection.
+
+![BRT planner and offline metro map](screenshots/Metro_Freelancing_Project_4.png)
 
 ---
 
